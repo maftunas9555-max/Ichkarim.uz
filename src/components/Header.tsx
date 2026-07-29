@@ -1,8 +1,13 @@
 "use client";
 
+import { usePathname } from "next/navigation";
 import { motion } from "framer-motion";
 
 export default function Header() {
+  const pathname = usePathname();
+
+  if (pathname === "/login") return null;
+
   return (
     <motion.header
       initial={{ y: -50, opacity: 0 }}
