@@ -18,7 +18,7 @@ export default function BottomNav() {
   if (pathname === "/login") return null;
 
   return (
-    <nav className="absolute bottom-0 w-full z-50 px-6 py-4 glass rounded-t-3xl border-t border-white/5">
+    <nav className="absolute bottom-0 w-full z-50 px-6 py-4 glass-soft rounded-t-3xl border-t border-white/40">
       <ul className="flex justify-between items-center relative">
         {navItems.map((item) => {
           const isActive = pathname === item.href;
@@ -33,20 +33,20 @@ export default function BottomNav() {
                 <div className="relative">
                   <Icon
                     className={`w-6 h-6 transition-all duration-300 ${
-                      isActive ? "text-neon-teal drop-shadow-[0_0_8px_rgba(0,245,212,0.8)] scale-110" : "text-gray-500 scale-100"
+                      isActive ? "text-[#ff756b] scale-110 drop-shadow-sm" : "text-[#8a7b78] scale-100"
                     }`}
                   />
                   {isActive && (
                     <motion.div
                       layoutId="nav-indicator"
-                      className="absolute -inset-3 bg-neon-teal/20 rounded-full blur-md -z-10"
+                      className="absolute -inset-3 bg-white/50 rounded-full blur-md -z-10"
                       transition={{ type: "spring", stiffness: 300, damping: 30 }}
                     />
                   )}
                 </div>
                 <span
-                  className={`text-xs font-medium transition-colors duration-300 mt-1 ${
-                    isActive ? "text-white text-shadow-neon-blue" : "text-gray-500"
+                  className={`text-xs font-bold transition-colors duration-300 mt-1 ${
+                    isActive ? "text-[#2d2d2d]" : "text-[#8a7b78]"
                   }`}
                 >
                   {item.name}

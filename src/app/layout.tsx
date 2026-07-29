@@ -29,12 +29,12 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased dark`}
+      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
-      <body className="min-h-full flex justify-center bg-black">
+      <body className="min-h-full flex justify-center bg-[#fcf1ef]">
         <SessionProvider>
           <KeepAlive />
-          <div className="w-full max-w-md bg-transparent min-h-screen relative overflow-hidden shadow-2xl flex flex-col">
+          <div className="w-full max-w-md bg-transparent min-h-screen relative overflow-hidden flex flex-col shadow-[0_0_50px_rgba(200,170,160,0.5)]">
             <Header />
             <main className="flex-1 overflow-y-auto no-scrollbar pb-24 pt-16">
               {children}

@@ -34,7 +34,7 @@ export default function ModuleCard({
       whileHover={{ scale: 1.02 }}
       whileTap={{ scale: 0.98 }}
       className={cn(
-        "relative rounded-3xl overflow-hidden bg-[#11131a]/80 backdrop-blur-md border border-white/5 cursor-pointer shadow-lg",
+        "relative rounded-[32px] overflow-hidden bg-[#fcf1ef] cursor-pointer neu-card",
         className
       )}
     >
@@ -42,13 +42,13 @@ export default function ModuleCard({
       <div className={cn("absolute top-0 left-0 w-full h-[110px]", colorClass)}>
         <div className="flex justify-between items-start p-5">
           <div className="text-white opacity-90">{icon}</div>
-          <div className="bg-black/20 backdrop-blur-sm text-white/90 text-[10px] font-bold px-3 py-1.5 rounded-full uppercase tracking-wider">
+          <div className="bg-white/20 backdrop-blur-sm text-white/90 text-[10px] font-bold px-3 py-1.5 rounded-full uppercase tracking-wider shadow-sm">
             {pillText}
           </div>
         </div>
         {/* Wavy SVG Divider */}
         <svg
-          className="absolute bottom-0 w-full h-8 text-[#11131a]/80 translate-y-[1px]"
+          className="absolute bottom-0 w-full h-8 text-[#fcf1ef] translate-y-[1px]"
           preserveAspectRatio="none"
           viewBox="0 0 1440 320"
         >
@@ -60,16 +60,17 @@ export default function ModuleCard({
         </svg>
       </div>
 
-      {/* Content Section */}
       <div className="relative pt-[115px] px-5 pb-5">
-        <h3 className="text-[19px] font-bold text-white mb-1 tracking-wide">{title}</h3>
-        <p className="text-xs text-gray-400 font-medium mb-4">{subtitle}</p>
+        <h3 className="text-[19px] font-bold text-[#2d2d2d] mb-1 tracking-wide">{title}</h3>
+        <p className="text-xs text-[#8a7b78] font-medium mb-4">{subtitle}</p>
         
-        <div className="h-[1px] w-full bg-white/5 my-4"></div>
+        <div className="h-[1px] w-full bg-[#8a7b78]/10 my-4"></div>
         
-        <div className="flex justify-between items-center text-gray-500 hover:text-gray-300 transition-colors">
-          <span className="text-[11px] font-medium tracking-wide">{footerText}</span>
-          <ChevronRight className="w-4 h-4" />
+        <div className="flex justify-between items-center text-[#ff756b] transition-colors">
+          <span className="text-[11px] font-bold tracking-wide">{footerText}</span>
+          <div className="bg-[#fcf1ef] p-1.5 rounded-full shadow-[inset_2px_2px_5px_rgba(220,195,185,0.6),inset_-2px_-2px_5px_rgba(255,255,255,0.9)]">
+             <ChevronRight className="w-4 h-4" />
+          </div>
         </div>
       </div>
     </motion.div>

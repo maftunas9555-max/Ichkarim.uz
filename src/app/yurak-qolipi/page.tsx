@@ -5,6 +5,8 @@ import { motion, AnimatePresence } from "framer-motion";
 import { useRouter } from "next/navigation";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
+import { ArrowLeft, Heart, Send } from "lucide-react";
+import Link from "next/link";
 
 // Gottman's 4 Horsemen + Perel's Erotic Intelligence asosida 15 ta savol
 const questions = [
@@ -283,61 +285,60 @@ Iltimos, mening natijalarimni Gottman va Perel yondashuvi asosida chuqur tahlil 
 
   return (
     <div className="flex flex-col h-full px-5 pt-4 pb-24">
+      <div className="flex items-center mb-6">
+        <Link href="/" className="neu-button p-2 text-[#8a7b78] hover:text-[#2d2d2d]">
+          <ArrowLeft className="w-6 h-6" />
+        </Link>
+        <h1 className="text-xl font-bold text-[#2d2d2d] ml-4">Yurak Qolipi</h1>
+      </div>
       <AnimatePresence mode="wait">
 
         {/* INTRO */}
         {step === "intro" && (
-          <motion.div key="intro" initial={{opacity:0,y:20}} animate={{opacity:1,y:0}} exit={{opacity:0,y:-20}} className="flex flex-col items-center justify-center h-full gap-5 text-center">
-            <div className="w-20 h-20 rounded-full bg-gradient-to-br from-orange-400 to-orange-600 flex items-center justify-center text-4xl shadow-[0_0_30px_rgba(251,146,60,0.3)]">
-              ❤️
+          <motion.div key="intro" initial={{opacity:0,y:20}} animate={{opacity:1,y:0}} exit={{opacity:0,y:-20}} className="flex flex-col gap-6">
+            <div className="neu-card p-6 border border-white/40 text-center">
+              <div className="flex justify-center mb-4">
+                <div className="p-4 rounded-full bg-[#fcf1ef] shadow-[inset_4px_4px_10px_rgba(220,195,185,0.6),inset_-4px_-4px_10px_rgba(255,255,255,0.9)]">
+                  <Heart className="w-8 h-8 text-[#b5838d]" />
+                </div>
+              </div>
+              <h2 className="text-lg font-bold text-[#2d2d2d] mb-2">Munosabatlar Tahlili</h2>
+              <p className="text-sm text-[#8a7b78] max-w-[300px] mx-auto font-medium mb-4">
+                Munosabatingizni chuqur tahlil qiling. 15 ta savol + shaxsiy AI tahlil.
+              </p>
+              <div className="flex gap-3 justify-center mb-6">
+                <span className="text-xs px-4 py-1.5 rounded-full neu-button text-[#8a7b78] font-bold">15 savol</span>
+                <span className="text-xs px-4 py-1.5 rounded-full neu-button text-[#8a7b78] font-bold">~10 daqiqa</span>
+              </div>
+              <button onClick={() => setStep("test")} className="w-full bg-[#b5838d] text-white py-3 rounded-full font-bold shadow-[0_4px_15px_rgba(181,131,141,0.4)] active:scale-95 transition-all">
+                Boshlash →
+              </button>
             </div>
-            <h1 className="text-2xl font-bold text-white">Yurak Qolipi</h1>
-            <p className="text-sm text-gray-400 max-w-[300px]">
-              Gottman va Perel yondashuvi asosida munosabatingizni chuqur tahlil qiling. 15 ta savol + shaxsiy AI tahlil.
-            </p>
-            <div className="flex gap-3 mt-2">
-              <span className="text-xs px-3 py-1 rounded-full bg-orange-500/20 text-orange-400 border border-orange-500/30">15 savol</span>
-              <span className="text-xs px-3 py-1 rounded-full bg-orange-500/20 text-orange-400 border border-orange-500/30">~10 daqiqa</span>
-            </div>
-            <button onClick={() => setStep("test")} className="mt-4 px-8 py-4 rounded-full bg-gradient-to-r from-orange-400 to-orange-600 text-white font-bold hover:shadow-[0_0_25px_rgba(251,146,60,0.3)] transition-all active:scale-95">
-              Boshlash →
-            </button>
-            <button onClick={() => router.back()} className="text-xs text-gray-500 hover:text-white transition-colors mt-1">← Orqaga</button>
           </motion.div>
         )}
 
         {/* TEST */}
         {step === "test" && (
           <motion.div key="test" initial={{opacity:0,x:20}} animate={{opacity:1,x:0}} exit={{opacity:0,x:-20}} className="flex flex-col gap-5">
-            {/* Progress */}
-            <div className="flex items-center gap-3">
-              <div className="flex-1 h-2 bg-white/10 rounded-full overflow-hidden">
-                <motion.div className="h-full bg-gradient-to-r from-orange-400 to-orange-600 rounded-full" animate={{width: `${((currentQ + 1) / questions.length) * 100}%`}} transition={{duration: 0.3}} />
-              </div>
-              <span className="text-xs text-gray-400 font-medium">{currentQ + 1}/{questions.length}</span>
+            <div className="flex items-center justify-between">
+              <span className="text-xs font-bold text-[#b5838d] uppercase tracking-wider">Savol {currentQ + 1}/{questions.length}</span>
             </div>
-
-            {/* Category Badge */}
+            <div className="h-2 bg-[#fcf1ef] rounded-full shadow-[inset_2px_2px_5px_rgba(220,195,185,0.6),inset_-2px_-2px_5px_rgba(255,255,255,0.9)]">
+              <motion.div className="h-full bg-[#b5838d] rounded-full" animate={{width: `${((currentQ + 1) / questions.length) * 100}%`}} transition={{duration: 0.3}} />
+            </div>
             <div className="text-center">
-              <span className="text-sm text-orange-400">{questions[currentQ].category}</span>
+              <span className="text-sm font-bold text-[#8a7b78]">{questions[currentQ].category}</span>
             </div>
-
-            {/* Question Card */}
             <AnimatePresence mode="wait">
               <motion.div key={currentQ} initial={{opacity:0,x:40}} animate={{opacity:1,x:0}} exit={{opacity:0,x:-40}} transition={{duration:0.25}}>
-                <div className="glass bg-[#11131a]/80 rounded-3xl p-6 border-white/10">
-                  <p className="text-white font-medium text-base leading-relaxed mb-6">{questions[currentQ].question}</p>
+                <div className="neu-card p-6 border border-white/40">
+                  <p className="text-[#2d2d2d] font-bold text-base leading-relaxed mb-5">{questions[currentQ].question}</p>
                   <div className="flex flex-col gap-3">
                     {questions[currentQ].options.map((opt, i) => (
-                      <button
-                        key={i}
-                        onClick={() => handleAnswer(opt.score)}
-                        className={`text-left p-4 rounded-2xl border text-sm transition-all active:scale-[0.98] ${
-                          selectedOption === opt.score
-                            ? "bg-orange-500/20 border-orange-500/60 text-orange-200"
-                            : "bg-white/5 border-white/10 text-gray-300 hover:border-orange-500/40 hover:bg-orange-500/10"
-                        }`}
-                      >
+                      <button key={i} onClick={() => handleAnswer(opt.score)}
+                        className={`text-left p-4 rounded-2xl text-sm font-medium transition-all active:scale-[0.98] ${
+                          selectedOption === opt.score ? "bg-[#b5838d] text-white shadow-md" : "neu-button text-[#2d2d2d]"
+                        }`}>
                         {opt.text}
                       </button>
                     ))}
@@ -351,80 +352,58 @@ Iltimos, mening natijalarimni Gottman va Perel yondashuvi asosida chuqur tahlil 
         {/* WRITE */}
         {step === "write" && (
           <motion.div key="write" initial={{opacity:0,y:20}} animate={{opacity:1,y:0}} exit={{opacity:0,y:-20}} className="flex flex-col gap-5">
-            <div className="text-center">
-              <span className="text-4xl mb-3 block">📝</span>
-              <h2 className="text-xl font-bold text-white mb-2">Deyarli tayyor!</h2>
-              <p className="text-sm text-gray-400">
-                Natijangiz: <span className="text-orange-400 font-bold">{totalScore}/{maxScore}</span>. 
-                Endi munosabatingiz haqida qo'shimcha yozib bering — AI yanada chuqurroq tahlil qiladi.
+            <div className="neu-card p-6 border border-white/40 text-center">
+              <div className="text-4xl mb-3">📝</div>
+              <h2 className="text-lg font-bold text-[#2d2d2d] mb-2">Deyarli tayyor!</h2>
+              <p className="text-sm text-[#8a7b78] mb-4">
+                Natijangiz: <span className="text-[#b5838d] font-bold">{totalScore}/{maxScore}</span>. Munosabatingiz haqida qo'shimcha yozing.
               </p>
+              <textarea value={writtenAnswer} onChange={(e) => setWrittenAnswer(e.target.value)}
+                placeholder="Masalan: Biz 3 yildan beri birgamiz, lekin so'nggi paytlarda ko'p janjallashyapmiz..."
+                className="w-full h-28 p-3 neu-input text-sm text-[#2d2d2d] placeholder:text-[#8a7b78]/50 resize-none rounded-2xl mb-4" />
+              <button onClick={handleSubmitAll} className="w-full bg-[#b5838d] text-white py-3 rounded-full font-bold shadow-[0_4px_15px_rgba(181,131,141,0.4)] active:scale-95 transition-all">
+                Tahlilni boshlash
+              </button>
             </div>
-
-            <textarea
-              value={writtenAnswer}
-              onChange={(e) => setWrittenAnswer(e.target.value)}
-              placeholder="Masalan: Biz 3 yildan beri birga, lekin so'nggi paytlarda ko'p janjallashyapmiz. Men uni sevaman, lekin ba'zan juda charchayman..."
-              className="w-full h-36 glass bg-[#11131a]/60 rounded-2xl p-4 text-white text-sm outline-none resize-none placeholder-gray-500 focus:border-orange-500/50 transition-colors"
-            />
-
-            <button onClick={handleSubmitAll} className="w-full py-4 rounded-full bg-gradient-to-r from-orange-400 to-orange-600 text-white font-bold hover:shadow-[0_0_25px_rgba(251,146,60,0.3)] transition-all active:scale-95">
-              Tahlilni boshlash 🔍
-            </button>
           </motion.div>
         )}
 
         {/* LOADING */}
         {step === "loading" && (
-          <motion.div key="loading" initial={{opacity:0}} animate={{opacity:1}} className="flex flex-col items-center justify-center h-full gap-4">
-            <div className="w-16 h-16 rounded-full bg-gradient-to-br from-orange-400 to-orange-600 flex items-center justify-center animate-pulse">
-              <span className="text-3xl">❤️</span>
+          <motion.div key="loading" initial={{opacity:0}} animate={{opacity:1}} className="flex flex-col items-center justify-center mt-20 gap-4">
+            <div className="p-6 rounded-full bg-[#fcf1ef] shadow-[inset_4px_4px_10px_rgba(220,195,185,0.6),inset_-4px_-4px_10px_rgba(255,255,255,0.9)] animate-pulse">
+              <Heart className="w-10 h-10 text-[#b5838d]" />
             </div>
-            <p className="text-sm text-gray-400">Gottman & Perel tahlili tayyorlanmoqda...</p>
+            <p className="text-sm text-[#8a7b78] font-medium">Tahlil qilinmoqda...</p>
           </motion.div>
         )}
 
         {/* CHAT */}
         {step === "chat" && (
-          <motion.div key="chat" initial={{opacity:0,y:20}} animate={{opacity:1,y:0}} className="flex flex-col h-full gap-3">
-            <div className="flex items-center justify-between pb-2 border-b border-white/10">
-              <div className="flex items-center gap-2">
-                <span className="text-lg">❤️</span>
-                <span className="font-medium text-sm text-orange-400">Yurak Qolipi — Tahlil</span>
-              </div>
-              <button onClick={() => router.back()} className="text-xs text-gray-500 hover:text-white">Tugatish</button>
-            </div>
-
-            <div ref={scrollRef} className="flex-1 overflow-y-auto flex flex-col gap-3 py-2 scrollbar-hide">
+          <motion.div key="chat" initial={{opacity:0,y:20}} animate={{opacity:1,y:0}} className="flex flex-col h-[calc(100vh-200px)] gap-3">
+            <div ref={scrollRef} className="flex-1 overflow-y-auto flex flex-col gap-3 py-2 no-scrollbar">
               {messages.filter((m, i) => i > 0 || m.role === "model").map((msg, idx) => (
                 <motion.div key={idx} initial={{opacity:0,y:10}} animate={{opacity:1,y:0}} className={`flex ${msg.role === "user" ? "justify-end" : "justify-start"}`}>
-                  <div className={`max-w-[88%] rounded-2xl p-4 text-sm leading-relaxed shadow-lg ${
+                  <div className={`max-w-[88%] rounded-2xl p-4 text-sm leading-relaxed ${
                     msg.role === "user"
-                      ? "bg-white/10 text-white rounded-br-sm"
-                      : "glass bg-[#11131a]/80 border-white/10 text-gray-200 rounded-bl-sm relative overflow-hidden"
+                      ? "bg-[#b5838d] text-white shadow-md rounded-br-sm"
+                      : "neu-card border border-white/40 text-[#2d2d2d] rounded-bl-sm prose prose-sm prose-p:text-[#2d2d2d] prose-strong:text-[#b5838d]"
                   }`}>
-                    {msg.role === "model" && <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-orange-400 to-orange-600"></div>}
-                    {msg.role === "model" ? (
-                      <div className="prose prose-invert prose-sm max-w-none prose-p:leading-relaxed prose-a:text-orange-400">
-                        <ReactMarkdown remarkPlugins={[remarkGfm]}>{msg.content}</ReactMarkdown>
-                      </div>
-                    ) : (
-                      msg.content
-                    )}
+                    <ReactMarkdown remarkPlugins={[remarkGfm]}>{msg.content}</ReactMarkdown>
                   </div>
                 </motion.div>
               ))}
               {isLoading && (
                 <div className="flex justify-start">
-                  <div className="rounded-2xl p-4 text-sm glass bg-[#11131a]/80 border-white/10 text-gray-400 rounded-bl-sm flex gap-1">
+                  <div className="rounded-2xl p-4 text-sm neu-card border border-white/40 text-[#8a7b78] rounded-bl-sm flex gap-1">
                     <span className="animate-pulse">●</span><span className="animate-pulse" style={{animationDelay:"0.2s"}}>●</span><span className="animate-pulse" style={{animationDelay:"0.4s"}}>●</span>
                   </div>
                 </div>
               )}
             </div>
-
-            <div className="pt-2 flex items-center gap-2">
-              <input type="text" value={chatInput} onChange={(e) => setChatInput(e.target.value)} onKeyDown={(e) => { if (e.key === "Enter") handleSend(); }} placeholder="Savol yozing..." className="flex-1 h-12 glass bg-[#11131a]/60 rounded-full px-4 text-white text-sm outline-none placeholder-gray-500" disabled={isLoading} />
-              <button disabled={isLoading || !chatInput.trim()} onClick={handleSend} className="h-12 w-12 flex items-center justify-center rounded-full disabled:opacity-50 bg-gradient-to-r from-orange-400 to-orange-600 text-white font-bold">➤</button>
+            <div className="flex items-center gap-2">
+              <input type="text" value={chatInput} onChange={(e) => setChatInput(e.target.value)} onKeyDown={(e) => { if (e.key === "Enter") handleSend(); }} placeholder="Savol yozing..." className="flex-1 h-12 neu-input rounded-full px-4 text-[#2d2d2d] text-sm placeholder:text-[#8a7b78]/50" disabled={isLoading} />
+              <button disabled={isLoading || !chatInput.trim()} onClick={handleSend} className="h-12 w-12 flex items-center justify-center neu-button text-[#b5838d] rounded-full disabled:opacity-50"><Send className="w-5 h-5" /></button>
             </div>
           </motion.div>
         )}
