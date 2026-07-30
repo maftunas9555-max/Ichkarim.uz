@@ -34,23 +34,23 @@ export default function Home() {
             initial={{ opacity: 0, y: -20, scale: 0.95 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: -20, scale: 0.95 }}
-            className="absolute top-4 left-5 right-5 z-50 neu-card p-5 border border-white/60 bg-[#fcf1ef]/95 backdrop-blur-md shadow-[0_10px_30px_rgba(220,195,185,0.8)] flex flex-col gap-3"
+            className="absolute top-4 left-5 right-5 z-50 neu-card p-5 border border-white/60 bg-[#FFF3CD]/95 backdrop-blur-md shadow-[0_10px_30px_rgba(215,200,160,0.8)] flex flex-col gap-3"
           >
             <div className="flex justify-between items-start">
               <div className="flex items-center gap-3">
-                <div className="p-2 rounded-full bg-white shadow-sm text-[#ff877b]">
+                <div className="p-2 rounded-full bg-white shadow-sm text-[#FFB800]">
                   <Bell className="w-5 h-5" />
                 </div>
                 <h3 className="font-bold text-[#2d2d2d]">Xush kelibsiz!</h3>
               </div>
-              <button onClick={closeNotification} className="neu-button p-1.5 text-[#8a7b78] hover:text-[#2d2d2d]">
+              <button onClick={closeNotification} className="neu-button p-1.5 text-[#5D4E37] hover:text-[#2d2d2d]">
                 <X className="w-4 h-4" />
               </button>
             </div>
-            <p className="text-sm text-[#8a7b78] font-medium leading-relaxed">
+            <p className="text-sm text-[#5D4E37] font-medium leading-relaxed">
               Bugun o'zingizga qanday g'amxo'rlik qildingiz? Rejalaringizni tekshirishni va yangi maqsadlar qo'yishni unutmang.
             </p>
-            <button onClick={closeNotification} className="w-full mt-2 bg-[#ff877b] text-white py-2.5 rounded-xl font-bold shadow-[0_4px_15px_rgba(255,135,123,0.4)] active:scale-95 transition-all">
+            <button onClick={closeNotification} className="w-full mt-2 bg-[#FFB800] text-white py-2.5 rounded-xl font-bold shadow-[0_4px_15px_rgba(255,184,0,0.4)] active:scale-95 transition-all">
               Boshlash
             </button>
           </motion.div>
@@ -66,8 +66,8 @@ export default function Home() {
           footerText="Bugungi vazifalar"
           pillText="Muhim"
           icon={<Target className="w-6 h-6" />}
-          colorClass="bg-[#ff877b]"
-          className="shadow-[0_4px_30px_rgba(255,135,123,0.3)]"
+          colorClass="bg-[#FFB800]"
+          className="shadow-[0_4px_30px_rgba(255,184,0,0.3)]"
         />
       </Link>
 
@@ -82,7 +82,7 @@ export default function Home() {
             footerText="Freyd va Yung yondashuvi"
             pillText="Tahlil"
             icon={<Zap className="w-6 h-6" />}
-            colorClass="bg-[#ffb4a2]"
+            colorClass="bg-[#FFC107]"
           />
         </Link>
 
@@ -95,7 +95,7 @@ export default function Home() {
             footerText="Erkin fikr yozing"
             pillText="Ai Tahlil"
             icon={<Activity className="w-6 h-6" />}
-            colorClass="bg-[#e5989b]"
+            colorClass="bg-[#FFCA28]"
           />
         </Link>
 
@@ -108,7 +108,7 @@ export default function Home() {
             footerText="Bir martalik chuqur test"
             pillText="15 savol"
             icon={<Heart className="w-6 h-6" />}
-            colorClass="bg-[#b5838d]"
+            colorClass="bg-[#FFD54F]"
           />
         </Link>
 
@@ -121,7 +121,7 @@ export default function Home() {
             footerText="2 bosqichli tahlil"
             pillText="10 savol"
             icon={<Compass className="w-6 h-6" />}
-            colorClass="bg-[#6d6875]"
+            colorClass="bg-[#FFE082]"
           />
         </Link>
 

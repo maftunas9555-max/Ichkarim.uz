@@ -33,7 +33,7 @@ export default function BottomNav() {
                 <div className="relative">
                   <Icon
                     className={`w-6 h-6 transition-all duration-300 ${
-                      isActive ? "text-[#ff756b] scale-110 drop-shadow-sm" : "text-[#8a7b78] scale-100"
+                      isActive ? "text-[#FFB800] scale-110 drop-shadow-sm" : "text-[#5D4E37] scale-100"
                     }`}
                   />
                   {isActive && (
@@ -46,7 +46,7 @@ export default function BottomNav() {
                 </div>
                 <span
                   className={`text-xs font-bold transition-colors duration-300 mt-1 ${
-                    isActive ? "text-[#2d2d2d]" : "text-[#8a7b78]"
+                    isActive ? "text-[#2d2d2d]" : "text-[#5D4E37]"
                   }`}
                 >
                   {item.name}

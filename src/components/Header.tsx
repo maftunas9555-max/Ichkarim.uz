@@ -20,7 +20,7 @@ export default function Header() {
       </h1>
       <button className="relative p-2 rounded-full hover:bg-white/10 transition-colors text-xl bg-[#1c1c1c] shadow-inner text-white border border-white/5">
         🔔
-        <span className="absolute top-1 right-1 w-2.5 h-2.5 bg-[#ff756b] rounded-full border-2 border-[#1c1c1c]"></span>
+        <span className="absolute top-1 right-1 w-2.5 h-2.5 bg-[#FFB800] rounded-full border-2 border-[#1c1c1c]"></span>
       </button>
     </motion.header>
   );

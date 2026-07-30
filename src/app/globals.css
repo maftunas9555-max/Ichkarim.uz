@@ -2,11 +2,11 @@
 @plugin "@tailwindcss/typography";
 
 :root {
-  --background: #fcf1ef;
-  --foreground: #2d2d2d;
-  --color-soft-peach: #ffd8cd;
-  --color-soft-red: #ff756b;
-  --color-muted-text: #8a7b78;
+  --background: #FFF3CD;
+  --foreground: #2D2D2D;
+  --color-soft-peach: #FFE599;
+  --color-soft-red: #FFB800;
+  --color-muted-text: #5D4E37;
 }
 
 @theme inline {
@@ -15,8 +15,8 @@
   --color-soft-peach: var(--color-soft-peach);
   --color-soft-red: var(--color-soft-red);
   --color-muted-text: var(--color-muted-text);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --font-sans: var(--font-poppins-sans);
+  --font-mono: var(--font-poppins-sans);
 }
 
 body {
@@ -39,34 +39,34 @@ body {
 
 /* Custom Neumorphic Utilities */
 .neu-card {
-  background: #fcf1ef;
+  background: var(--background);
   border-radius: 24px;
-  box-shadow: 8px 8px 16px rgba(220, 195, 185, 0.6),
+  box-shadow: 8px 8px 16px rgba(215, 200, 160, 0.6),
               -8px -8px 16px rgba(255, 255, 255, 0.9);
   transition: all 0.3s ease;
 }
 
 .neu-card:active {
-  box-shadow: inset 6px 6px 12px rgba(220, 195, 185, 0.6),
+  box-shadow: inset 6px 6px 12px rgba(215, 200, 160, 0.6),
               inset -6px -6px 12px rgba(255, 255, 255, 0.9);
 }
 
 .neu-button {
-  background: #fcf1ef;
+  background: var(--background);
   border-radius: 9999px;
-  box-shadow: 4px 4px 10px rgba(220, 195, 185, 0.6),
+  box-shadow: 4px 4px 10px rgba(215, 200, 160, 0.6),
               -4px -4px 10px rgba(255, 255, 255, 0.9);
   transition: all 0.2s ease;
 }
 
 .neu-button:active {
-  box-shadow: inset 4px 4px 10px rgba(220, 195, 185, 0.6),
+  box-shadow: inset 4px 4px 10px rgba(215, 200, 160, 0.6),
               inset -4px -4px 10px rgba(255, 255, 255, 0.9);
 }
 
 .neu-input {
-  background: #fcf1ef;
-  box-shadow: inset 6px 6px 10px rgba(220, 195, 185, 0.6),
+  background: var(--background);
+  box-shadow: inset 6px 6px 10px rgba(215, 200, 160, 0.6),
               inset -6px -6px 10px rgba(255, 255, 255, 0.9);
   border: none;
   outline: none;
@@ -74,7 +74,7 @@ body {
 
 /* For elements that need a distinct "glass" over the neumorphic bg */
 .glass-soft {
-  background: rgba(255, 216, 205, 0.4);
+  background: rgba(255, 229, 153, 0.4);
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
   border: 1px solid rgba(255, 255, 255, 0.6);

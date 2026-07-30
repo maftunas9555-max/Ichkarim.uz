@@ -1,152 +1,104 @@
 "use client";
 
-import { useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
-import { ArrowLeft, Zap, Battery, BatteryMedium, BatteryWarning, Send } from "lucide-react";
+import { useState, useEffect } from "react";
+import { ArrowLeft, Battery, BatteryCharging, AlertTriangle } from "lucide-react";
 import Link from "next/link";
-import ReactMarkdown from "react-markdown";
+import { motion } from "framer-motion";
 
-export default function EnergiyaPage() {
-  const [step, setStep] = useState(1);
-  const [input, setInput] = useState("");
-  const [loading, setLoading] = useState(false);
-  const [aiResponse, setAiResponse] = useState<string | null>(null);
+export default function Energiya() {
+  const [thoughts, setThoughts] = useState("");
+  const [energyLevel, setEnergyLevel] = useState(100);
 
-  const analyzeEnergy = async () => {
-    if (!input.trim()) return;
-    setLoading(true);
-    try {
-      const response = await fetch("/api/chat", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          message: `Soya va Energiya tahlili: ${input}`,
-          systemPrompt: "Sen Zigmund Freyd va Karl Yung ta'limotlarini chuqur biluvchi psixoanalitiksan. Mijozning bu javobidan uning psixik energiyasi qayerga ketayotganini (g'iybat, nafrat, qo'rquv, boshqalar haqida o'ylash) aniqla. JAVOBING QISQA VA LONDDA bo'lsin. Faqatgina: 1. Muammo nima (Energiya qayerga oqyapti). 2. Yechim (Amaliy vazifa). Ortiqcha gap va muallif nomlarini ishlatma.",
-        }),
-      });
+  // Calculate energy level based on the amount of text written.
+  // The more negative thoughts they dump, the lower the energy gets (down to 0).
+  useEffect(() => {
+    const charCount = thoughts.length;
+    // Let's say 200 characters drops energy to 0
+    let calculatedEnergy = 100 - Math.floor((charCount / 200) * 100);
+    if (calculatedEnergy < 0) calculatedEnergy = 0;
+    if (calculatedEnergy > 100) calculatedEnergy = 100;
+    
+    setEnergyLevel(calculatedEnergy);
+  }, [thoughts]);
 
-      if (!response.ok) throw new Error("API Error");
+  // Determine colors based on energy level
+  const getEnergyColor = () => {
+    if (energyLevel > 50) return "bg-green-500 shadow-[0_0_15px_rgba(34,197,94,0.5)]";
+    if (energyLevel > 20) return "bg-yellow-500 shadow-[0_0_15px_rgba(234,179,8,0.5)]";
+    return "bg-red-500 shadow-[0_0_15px_rgba(239,68,68,0.8)]";
+  };
 
-      const data = await response.json();
-      setAiResponse(data.reply);
-      setStep(3);
-    } catch (error) {
-      console.error(error);
-    } finally {
-      setLoading(false);
-    }
+  const getTextColor = () => {
+    if (energyLevel > 50) return "text-green-500";
+    if (energyLevel > 20) return "text-yellow-600";
+    return "text-red-500";
+  };
+
+  const getFeedbackMessage = () => {
+    if (energyLevel > 50) return "Energiyangiz joyida. Lekin ichingizda nimadir yig'ilayotgan bo'lsa, uni chiqarib tashlang.";
+    if (energyLevel > 20) return "Sizni nimalardir qiynamoqda. Negativ o'ylar energiyangizni so'rib olyapti.";
+    return "Diqqat! Energiyangiz 0 ga yaqinlashdi. Siz butunlay negativga to'lib ketgansiz. Buni zudlik bilan to'xtatish kerak!";
   };
 
   return (
-    <div className="min-h-screen px-6 py-8 flex flex-col items-center">
-      <div className="w-full max-w-md">
-        
-        {/* Header */}
-        <div className="flex items-center mb-8 w-full">
-          <Link href="/" className="neu-button p-2 text-[#8a7b78] hover:text-[#2d2d2d]">
-            <ArrowLeft className="w-6 h-6" />
-          </Link>
-          <h1 className="text-xl font-bold text-[#2d2d2d] ml-4 drop-shadow-sm">Energiyangizni Yo'naltiring</h1>
+    <div className="flex flex-col min-h-screen px-5 pt-6 pb-24">
+      <div className="flex items-center mb-6">
+        <Link href="/" className="neu-button p-2 text-[var(--color-muted-text)] hover:text-[var(--color-foreground)]">
+          <ArrowLeft className="w-6 h-6" />
+        </Link>
+        <h1 className="text-xl font-bold text-[var(--color-foreground)] ml-4 drop-shadow-sm">Energiya</h1>
+      </div>
+
+      <div className="flex flex-col items-center justify-center mb-8 mt-4">
+        {/* Energy Tank Visual */}
+        <div className="relative w-32 h-64 neu-card rounded-3xl p-2 border border-white/40 overflow-hidden flex flex-col justify-end items-center">
+          {/* Top terminal of battery */}
+          <div className="absolute -top-3 left-1/2 -translate-x-1/2 w-10 h-3 neu-card rounded-t-lg z-10" />
+          
+          <div className="absolute inset-2 rounded-2xl overflow-hidden bg-black/5 z-0 flex flex-col justify-end">
+            <motion.div 
+              className={`w-full rounded-xl transition-all duration-500 ${getEnergyColor()}`}
+              initial={{ height: "100%" }}
+              animate={{ height: `${energyLevel}%` }}
+              transition={{ type: "spring", bounce: 0.4 }}
+            />
+          </div>
+
+          <div className="absolute inset-0 flex items-center justify-center z-10 font-bold text-2xl drop-shadow-md text-white mix-blend-difference">
+            {energyLevel}%
+          </div>
         </div>
 
-        <AnimatePresence mode="wait">
-          {step === 1 && (
-            <motion.div
-              key="intro"
-              initial={{ opacity: 0, scale: 0.95 }}
-              animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, y: -20 }}
-              className="flex flex-col gap-6"
-            >
-              <div className="neu-card p-6 border border-white/40 text-center">
-                <div className="flex justify-center mb-4">
-                  <div className="p-4 rounded-full bg-[#fcf1ef] shadow-[inset_4px_4px_10px_rgba(220,195,185,0.6),inset_-4px_-4px_10px_rgba(255,255,255,0.9)]">
-                    <Battery className="w-10 h-10 text-[#ff756b]" />
-                  </div>
-                </div>
-                <h2 className="text-xl font-bold text-[#2d2d2d] mb-3">Sizning Psixik Energiyangiz</h2>
-                <p className="text-sm text-[#8a7b78] leading-relaxed font-medium">
-                  Insonning ichki quvvati cheklangan. Birovlar haqida o'ylash, ularni muhokama qilish, xafagarchilik va nafrat —
-                  bu sizning shaxsiy maqsadingizga ketishi kerak bo'lgan quvvatni (Libido) havoga sovurishdir. 
-                  Bu sizning ichki "Soyangiz" ishga tushganligini anglatadi.
-                </p>
-                <button
-                  onClick={() => setStep(2)}
-                  className="mt-6 w-full neu-button bg-[#ff756b] text-[#fcf1ef] py-4 rounded-full font-bold tracking-wide"
-                >
-                  Energiyamni tekshirish
-                </button>
-              </div>
-            </motion.div>
-          )}
+        <div className={`mt-6 text-center font-bold text-sm ${getTextColor()} px-4 flex items-center justify-center gap-2`}>
+          {energyLevel <= 20 && <AlertTriangle className="w-5 h-5 animate-pulse" />}
+          {getFeedbackMessage()}
+        </div>
+      </div>
 
-          {step === 2 && (
-            <motion.div
-              key="input"
-              initial={{ opacity: 0, x: 50 }}
-              animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: -50 }}
-              className="flex flex-col gap-4"
-            >
-              <div className="neu-card p-5 border border-white/40">
-                <div className="flex items-center gap-2 mb-3">
-                  <BatteryWarning className="w-6 h-6 text-[#ff756b]" />
-                  <h3 className="font-bold text-[#2d2d2d]">O'zingizga halol bo'ling</h3>
-                </div>
-                <p className="text-xs text-[#8a7b78] mb-4 font-medium">
-                  Hozirgi paytda kimdir sizni asabiylashtiryaptimi? Kimdandir xafamisiz yoki kimningdir hayotiga ko'p qiziqyapsizmi? Vaziyatni yozing.
-                </p>
-                
-                <textarea
-                  value={input}
-                  onChange={(e) => setInput(e.target.value)}
-                  placeholder="Hozirgi holatim shuki..."
-                  className="w-full h-32 p-4 neu-input text-sm text-[#2d2d2d] placeholder:text-[#8a7b78]/50 resize-none rounded-2xl mb-4"
-                />
-
-                <button
-                  onClick={analyzeEnergy}
-                  disabled={loading || !input.trim()}
-                  className="w-full neu-button bg-[#ff756b] text-[#fcf1ef] py-3 rounded-full font-bold flex items-center justify-center gap-2 disabled:opacity-50"
-                >
-                  {loading ? (
-                    <span className="animate-pulse">Tahlil qilinmoqda...</span>
-                  ) : (
-                    <>Tahlil Qilish <Send className="w-4 h-4" /></>
-                  )}
-                </button>
-              </div>
-            </motion.div>
-          )}
-
-          {step === 3 && aiResponse && (
-            <motion.div
-              key="result"
-              initial={{ opacity: 0, scale: 0.95 }}
-              animate={{ opacity: 1, scale: 1 }}
-              className="flex flex-col gap-4"
-            >
-              <div className="neu-card p-6 border border-white/40 prose prose-sm max-w-none prose-p:text-[#2d2d2d] prose-headings:text-[#ff756b] prose-strong:text-[#ff756b]">
-                <div className="flex justify-center mb-4">
-                  <BatteryMedium className="w-8 h-8 text-[#ff756b]" />
-                </div>
-                <ReactMarkdown>{aiResponse}</ReactMarkdown>
-                
-                <button
-                  onClick={() => {
-                    setStep(1);
-                    setInput("");
-                    setAiResponse(null);
-                  }}
-                  className="mt-6 w-full neu-button py-3 rounded-full font-bold text-[#8a7b78]"
-                >
-                  Tushundim, qaytish
-                </button>
-              </div>
-            </motion.div>
-          )}
-        </AnimatePresence>
-
+      <div className="flex-1 flex flex-col gap-3">
+        <label className="text-sm font-bold text-[var(--color-foreground)] ml-2">
+          Miyangizni tozalang:
+        </label>
+        <p className="text-xs text-[var(--color-muted-text)] font-medium ml-2 mb-1">
+          Bugun qanday negativ voqealar yoki o'y-hayollar sizni qiynadi? Hammasini yozib qoldiring.
+        </p>
+        <textarea
+          value={thoughts}
+          onChange={(e) => setThoughts(e.target.value)}
+          placeholder="Hammasi yomg'irday yog'ib keldi, asablarim chidamyapti..."
+          className="w-full flex-1 min-h-[200px] p-5 neu-input text-sm text-[var(--color-foreground)] placeholder:text-[var(--color-muted-text)]/50 resize-none rounded-2xl"
+        />
+        
+        <button
+          onClick={() => {
+            setThoughts("");
+            setEnergyLevel(100);
+          }}
+          disabled={!thoughts}
+          className="mt-2 w-full neu-button bg-[var(--color-foreground)] text-[var(--background)] py-4 rounded-xl font-bold flex items-center justify-center gap-2 disabled:opacity-50"
+        >
+          Tozalash va Energiyani Tiklash
+        </button>
       </div>
     </div>
   );
