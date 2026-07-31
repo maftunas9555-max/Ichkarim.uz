@@ -133,9 +133,17 @@ Tahlilni quyidagi strukturada ber:
           ...msgs,
           { role: "model", content: data.reply || data.message },
         ]);
+      } else {
+        setChatMessages([
+          ...msgs,
+          { role: "model", content: `❌ Xatolik yuz berdi: ${data.error || "AI xizmatiga ulanib bo'lmadi. Vercel'dagi GEMINI_API_KEY to'g'riligini tekshiring."}` },
+        ]);
       }
     } catch {
-      // silent
+      setChatMessages([
+        ...msgs,
+        { role: "model", content: "❌ Tarmoq xatosi. Iltimos qaytadan urinib ko'ring." },
+      ]);
     } finally {
       setIsLoading(false);
     }
