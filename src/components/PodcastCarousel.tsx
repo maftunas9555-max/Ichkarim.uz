@@ -38,59 +38,66 @@ export default function PodcastCarousel() {
         <span className="text-xs font-bold text-[#6B7A6A] tracking-wider uppercase">Tavsiya etamiz</span>
       </div>
 
-      <div className="relative w-full aspect-[16/10] rounded-[32px] overflow-hidden bg-[#F5F8F2] shadow-sm group">
+      <div className="relative rounded-[32px] overflow-hidden bg-[#F5F8F2] shadow-sm h-[210px]">
         <AnimatePresence mode="wait">
           <motion.a
             key={currentIndex}
             href={PODCASTS[currentIndex].link}
             target="_blank"
             rel="noopener noreferrer"
-            initial={{ opacity: 0, scale: 1.05 }}
-            animate={{ opacity: 1, scale: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.6, ease: "easeOut" }}
-            className="absolute inset-0 block"
+            initial={{ opacity: 0, x: 20 }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, x: -20 }}
+            transition={{ duration: 0.5, ease: "easeOut" }}
+            className="absolute inset-0 block cursor-pointer"
           >
-            {/* Background Image */}
-            <img 
-              src={PODCASTS[currentIndex].image} 
-              alt={PODCASTS[currentIndex].author}
-              className="w-full h-full object-cover"
-            />
-            
-            {/* Gradient Overlay for text readability */}
-            <div className="absolute inset-0 bg-gradient-to-t from-[#2C3E2D]/90 via-[#2C3E2D]/30 to-transparent"></div>
+            {/* Top Wavy Image Section */}
+            <div className="absolute top-0 left-0 w-full h-[110px]">
+              <img 
+                src={PODCASTS[currentIndex].image} 
+                alt={PODCASTS[currentIndex].author}
+                className="w-full h-full object-cover"
+              />
+              <div className="absolute inset-0 bg-black/10 transition-colors hover:bg-black/20" />
+              
+              {/* Play icon centered in the image area */}
+              <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 mt-[-5px]">
+                 <PlayCircle className="w-10 h-10 text-white/90 drop-shadow-md" />
+              </div>
 
-            {/* Play Button Overlay (Visible on Hover/Always subtle) */}
-            <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-              <div className="w-16 h-16 bg-white/20 backdrop-blur-md rounded-full flex items-center justify-center border border-white/30">
-                <PlayCircle className="w-8 h-8 text-white fill-white/20" />
-              </div>
+              {/* Wavy SVG Divider */}
+              <svg
+                className="absolute bottom-0 w-full h-8 text-[#F5F8F2] translate-y-[1px]"
+                preserveAspectRatio="none"
+                viewBox="0 0 1440 320"
+              >
+                <path
+                  fill="currentColor"
+                  fillOpacity="1"
+                  d="M0,192L48,197.3C96,203,192,213,288,202.7C384,192,480,160,576,144C672,128,768,128,864,138.7C960,149,1056,171,1152,176C1248,181,1344,171,1392,165.3L1440,160L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z"
+                ></path>
+              </svg>
             </div>
-            
-            {/* Text Content */}
-            <div className="absolute bottom-0 left-0 w-full p-6 flex flex-col justify-end">
-              <div className="flex justify-between items-end gap-4">
-                <div className="flex-1">
-                  <h3 className="font-serif text-[22px] font-bold text-white leading-tight mb-1.5 drop-shadow-md">
-                    {PODCASTS[currentIndex].author}
-                  </h3>
-                  <p className="text-[13px] text-white/90 font-medium leading-snug line-clamp-2 drop-shadow-sm">
-                    {PODCASTS[currentIndex].title}
-                  </p>
-                </div>
-              </div>
+
+            {/* Bottom Text Section */}
+            <div className="relative pt-[115px] px-5 pb-5">
+              <h3 className="text-[19px] font-bold text-[#2C3E2D] mb-1 tracking-wide font-serif line-clamp-1">
+                {PODCASTS[currentIndex].author}
+              </h3>
+              <p className="text-[13px] text-[#6B7A6A] font-medium leading-snug line-clamp-2 pr-8">
+                {PODCASTS[currentIndex].title}
+              </p>
             </div>
           </motion.a>
         </AnimatePresence>
 
-        {/* Indicators inside the card */}
-        <div className="absolute bottom-5 right-6 flex gap-1.5 z-10">
+        {/* Indicators at the bottom right */}
+        <div className="absolute bottom-5 right-5 flex gap-1.5 z-10">
           {PODCASTS.map((_, idx) => (
             <div
               key={idx}
               className={`h-1.5 rounded-full transition-all duration-300 shadow-sm ${
-                idx === currentIndex ? "w-5 bg-[#49A045]" : "w-1.5 bg-white/50"
+                idx === currentIndex ? "w-4 bg-[#49A045]" : "w-1.5 bg-[#49A045]/20"
               }`}
             />
           ))}
