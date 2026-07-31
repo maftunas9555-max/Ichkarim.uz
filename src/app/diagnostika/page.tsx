@@ -1,122 +1,140 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { ArrowLeft, ArrowUp, Zap, BatteryFull, BatteryMedium, BatteryLow, MessageCircle } from "lucide-react";
+import { ArrowUp, ArrowLeft, MessageCircle } from "lucide-react";
 import Link from "next/link";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 
-type EnergyLevel = "100" | "50" | "10" | null;
+type Step = "energy" | "cards" | "analysis";
 
-export default function DiagnostikaGreen() {
-  const [energy, setEnergy] = useState<EnergyLevel>(null);
-  const [showConfirm, setShowConfirm] = useState(false);
-  const [started, setStarted] = useState(false);
-  
-  // Quiz State
-  const [answers, setAnswers] = useState<string[]>(["", "", ""]);
+const CARDS = [
+  {
+    author: "S. Freud",
+    quote: "Inson eng ko\u2018p energiyani o\u2018zidan yashirgan haqiqatlariga sarflaydi.",
+    question:
+      "Hozir hayotingizda tan olishdan qochayotgan, sizga ichki azob va qarshilik berayotgan narsa nima?",
+  },
+  {
+    author: "C. Jung",
+    quote:
+      "Boshqalardagi bizni g\u2018azablantiradigan xislatlar \u2014 o\u2018zimizni anglash kalitidir.",
+    question:
+      "Atrofingizdagilarning qaysi harakati sizning g\u2018ashingizga tegib, quvvatingizni so\u2018rib olyapti?",
+  },
+  {
+    author: "Asl istak",
+    quote:
+      "Sizning qayerga qarayotganingiz emas, nima ko\u2018rayotganingiz muhim.",
+    question:
+      "Hech qanday to\u2018siq (qo\u2018rquv, pul, odamlar gapi) bo\u2018lmaganda, ayni damdagi bor kuchingizni nima qilishga sarflardingiz?",
+  },
+];
+
+export default function Diagnostika() {
+  const [step, setStep] = useState<Step>("energy");
+  const [energy, setEnergy] = useState<string | null>(null);
+  const [showModal, setShowModal] = useState(false);
+
+  // Cards state
   const [currentCard, setCurrentCard] = useState(0);
+  const [answers, setAnswers] = useState<string[]>(["", "", ""]);
   const [inputValue, setInputValue] = useState("");
-  
-  // AI/Chat state
-  const [analysisDone, setAnalysisDone] = useState(false);
+
+  // Analysis & Chat state
   const [isLoading, setIsLoading] = useState(false);
-  const [chatMessages, setChatMessages] = useState<{role: "user" | "model", content: string}[]>([]);
+  const [chatMessages, setChatMessages] = useState<
+    { role: "user" | "model"; content: string }[]
+  >([]);
   const [chatInput, setChatInput] = useState("");
+  const chatEndRef = useRef<HTMLDivElement>(null);
 
-  const CARDS = [
-    {
-      author: "S. Freud",
-      quote: "Inson eng ko'p energiyani o'zidan yashirgan haqiqatlariga sarflaydi.",
-      question: "Hozir hayotingizda tan olishdan qochayotgan, sizga ichki azob va qarshilik berayotgan narsa nima?"
-    },
-    {
-      author: "C. Jung",
-      quote: "Boshqalardagi bizni g'azablantiradigan xislatlar — o'zimizni anglash kalitidir.",
-      question: "Atrofingizdagilarning qaysi harakati sizning g'ashingizga tegib, quvvatingizni so'rib olyapti?"
-    },
-    {
-      author: "Asl istak",
-      quote: "Sizning qayerga qarayotganingiz emas, nima ko'rayotganingiz muhim.",
-      question: "Hech qanday to'siq (qo'rquv, pul, odamlar gapi) bo'lmaganda, ayni damdagi bor kuchingizni nima qilishga sarflardingiz?"
-    }
-  ];
+  useEffect(() => {
+    chatEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [chatMessages]);
 
-  const handleSelectEnergy = (level: EnergyLevel) => {
+  /* ─── handlers ─── */
+  const selectEnergy = (level: string) => {
     setEnergy(level);
-    setShowConfirm(true);
+    setShowModal(true);
   };
 
-  const handleConfirm = () => {
-    setShowConfirm(false);
-    setStarted(true);
+  const confirmStart = () => {
+    setShowModal(false);
+    setStep("cards");
   };
 
   const submitAnswer = async () => {
-    if (!inputValue.trim()) return;
-    
-    const newAnswers = [...answers];
-    newAnswers[currentCard] = inputValue;
-    setAnswers(newAnswers);
+    const trimmed = inputValue.trim();
+    if (!trimmed) return;
+
+    const updated = [...answers];
+    updated[currentCard] = trimmed;
+    setAnswers(updated);
     setInputValue("");
 
     if (currentCard < 2) {
       setCurrentCard(currentCard + 1);
     } else {
-      // Finished all cards, generate AI analysis
-      setAnalysisDone(true);
-      await generateAnalysis(newAnswers);
+      // all 3 cards done — send to AI
+      setStep("analysis");
+      await generateAnalysis(updated);
     }
   };
 
   const generateAnalysis = async (finalAnswers: string[]) => {
     setIsLoading(true);
-    
-    const userPrompt = `
-Mening tanlagan energiyam: ${energy}%
+
+    const prompt = `Mening tanlagan energiyam: ${energy}%
+
 1. Yashirgan haqiqatim (Freyd): ${finalAnswers[0]}
 2. Meni g'azablantiradigan xislat (Yung): ${finalAnswers[1]}
-3. Asl istagim: ${finalAnswers[2]}
-`;
-    
-    const newMsgs = [{ role: "user" as const, content: userPrompt }];
-    setChatMessages(newMsgs);
+3. Asl istagim: ${finalAnswers[2]}`;
+
+    const msgs = [{ role: "user" as const, content: prompt }];
+    setChatMessages(msgs);
 
     try {
       const res = await fetch("/api/chat", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ 
-          messages: newMsgs,
-          systemPrompt: `Siz professional va to'g'ridan-to'g'ri haqiqatni aytuvchi kouch/psixologsiz.
-Mijozning muammolarini chuqur tahlil qilib yechim bering.
-QAT'IY STRUKTURA:
-Javobingiz quyidagi 3 ta qismdan iborat bo'lishi shart (hech qanday salomlashishlarsiz):
+        body: JSON.stringify({
+          messages: msgs,
+          systemPrompt: `Sen professional va to'g'ridan-to'g'ri haqiqatni aytuvchi kouch/psixologsan.
+Mijozning muammolarini chuqur tahlil qilib yechim ber.
+QAT'IY STRUKTURA (hech qanday salomlashishlarsiz):
 
-🔍 Asl muammo: [Tahlil. Nimaga energiyasi ketyapti va nega o'zini aldayapti]
+🔍 **Asl muammo:** [Tahlil — nimaga energiyasi ketyapti, nega o'zini aldayapti]
 
-💡 Yechim: [C. Jung yoki Freyd arxetiplaridan foydalanib yechim. Nima qilish kerakligi haqida aniq ko'rsatma]
+💡 **Yechim:** [C. Jung yoki Freyd arxetiplaridan foydalanib yechim. Nima qilish kerakligi haqida aniq ko'rsatma]
 
-🚀 Amaliy qadam: [Shu yerning o'zidayoq qilish kerak bo'lgan konkret 1 ta qadam]`
+🚀 **Amaliy qadam:** [Shu zahotiyoq qilish kerak bo'lgan konkret 1 ta qadam]`,
         }),
       });
       const data = await res.json();
       if (res.ok) {
-        setChatMessages([...newMsgs, { role: "model", content: data.reply || data.message }]);
+        setChatMessages([
+          ...msgs,
+          { role: "model", content: data.reply || data.message },
+        ]);
       }
-    } catch (err) {
-      console.error(err);
+    } catch {
+      // silent
     } finally {
       setIsLoading(false);
     }
   };
 
-  const sendChatMessage = async () => {
-    if (!chatInput.trim() || isLoading) return;
-    
-    const newMsgs = [...chatMessages, { role: "user" as const, content: chatInput }];
-    setChatMessages(newMsgs);
+  const sendChat = async () => {
+    const trimmed = chatInput.trim();
+    if (!trimmed || isLoading) return;
+
+    const updated = [
+      ...chatMessages,
+      { role: "user" as const, content: trimmed },
+    ];
+    setChatMessages(updated);
     setChatInput("");
     setIsLoading(true);
 
@@ -124,99 +142,106 @@ Javobingiz quyidagi 3 ta qismdan iborat bo'lishi shart (hech qanday salomlashish
       const res = await fetch("/api/chat", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ 
-          messages: newMsgs,
-          systemPrompt: "Sen shaxsiy psixolog kouchsan. Mijozning savoli yoki e'tiroziga real vaqtda empatik, lekin prinsipial va konkret maslahat ber. Qisqa va lo'nda yoz."
+        body: JSON.stringify({
+          messages: updated,
+          systemPrompt:
+            "Sen shaxsiy psixolog kouchsan. Mijozning savoli yoki e'tiroziga real vaqtda empatik, lekin prinsipial va konkret maslahat ber. Qisqa va lo'nda yoz.",
         }),
       });
       const data = await res.json();
       if (res.ok) {
-        setChatMessages([...newMsgs, { role: "model", content: data.reply || data.message }]);
+        setChatMessages([
+          ...updated,
+          { role: "model", content: data.reply || data.message },
+        ]);
       }
-    } catch (err) {
+    } catch {
+      // silent
     } finally {
       setIsLoading(false);
     }
   };
 
-  // Find the AI response in chatMessages (it's the first model response)
-  const initialAnalysis = chatMessages.find(m => m.role === "model")?.content;
-  // Further chat is everything after index 1
-  const conversation = chatMessages.slice(2);
+  const aiResponse = chatMessages.find((m) => m.role === "model")?.content;
+  const furtherChat = chatMessages.slice(2);
 
+  /* ─── render ─── */
   return (
-    <div className="flex flex-col min-h-screen text-white relative w-full h-full pb-32 pt-6 px-4">
-      {/* Absolute positioning for the global gradient to ensure it's everywhere if body is not covering */}
-      <div className="fixed inset-0 bg-gradient-to-b from-[#49A045] to-[#E7F0E2] -z-10" />
-
-      {/* Header */}
-      <div className="flex items-center mb-8 relative z-10 w-full">
-        <Link href="/" className="rounded-full bg-white/20 p-2 text-white hover:bg-white/30 backdrop-blur-md transition-all">
+    <div className="flex flex-col min-h-screen w-full pb-28">
+      {/* Back button */}
+      <div className="px-5 pt-5 pb-2">
+        <Link
+          href="/"
+          className="inline-flex items-center justify-center w-10 h-10 rounded-full bg-white/20 text-white backdrop-blur-md hover:bg-white/30 transition-all"
+        >
           <ArrowLeft className="w-5 h-5" />
         </Link>
       </div>
 
       <AnimatePresence mode="wait">
-        {/* SCREEN 1: Energy Selection */}
-        {!started && (
+        {/* ════════ SCREEN 1: ENERGY ════════ */}
+        {step === "energy" && (
           <motion.div
             key="energy"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -20 }}
-            className="flex flex-col w-full"
+            className="px-6"
           >
-            <h1 className="text-4xl font-serif leading-tight mb-8 drop-shadow-md text-white">
-              Bugun ichki quvvatingiz qanday darajada?
+            {/* Heading */}
+            <h1 className="font-serif text-[28px] sm:text-[32px] leading-snug text-white drop-shadow-md mb-8">
+              Bugun ichki quvvatingiz
+              <br />
+              qanday darajada?
             </h1>
 
+            {/* Energy pills */}
             <div className="flex flex-wrap gap-3 mb-10">
-              <button 
-                onClick={() => handleSelectEnergy("100")}
-                className={`px-5 py-3 rounded-full font-medium text-[15px] flex items-center gap-2 transition-all ${
-                  energy === "100" ? "bg-white text-[#49A045] shadow-lg scale-105" : "bg-white/20 text-white backdrop-blur-md border border-white/10"
-                }`}
-              >
-                <Zap className="w-4 h-4" /> 100%
-              </button>
-              <button 
-                onClick={() => handleSelectEnergy("50")}
-                className={`px-5 py-3 rounded-full font-medium text-[15px] flex items-center gap-2 transition-all ${
-                  energy === "50" ? "bg-white text-[#49A045] shadow-lg scale-105" : "bg-white/20 text-white backdrop-blur-md border border-white/10"
-                }`}
-              >
-                <BatteryMedium className="w-4 h-4" /> 50%
-              </button>
-              <button 
-                onClick={() => handleSelectEnergy("10")}
-                className={`px-5 py-3 rounded-full font-medium text-[15px] flex items-center gap-2 transition-all ${
-                  energy === "10" ? "bg-white text-[#49A045] shadow-lg scale-105" : "bg-white/20 text-white backdrop-blur-md border border-white/10"
-                }`}
-              >
-                <BatteryLow className="w-4 h-4" /> 10%
-              </button>
+              {[
+                { label: "⚡️ 100%", value: "100" },
+                { label: "🔋 50%", value: "50" },
+                { label: "🪫 10%", value: "10" },
+              ].map((item) => (
+                <button
+                  key={item.value}
+                  onClick={() => selectEnergy(item.value)}
+                  className={`px-6 py-3 rounded-full text-[15px] font-medium transition-all duration-200 ${
+                    energy === item.value
+                      ? "bg-white text-[#2C3E2D] shadow-lg scale-105"
+                      : "bg-white/15 text-white border border-white/20 backdrop-blur-sm hover:bg-white/25"
+                  }`}
+                >
+                  {item.label}
+                </button>
+              ))}
             </div>
 
+            {/* Confirmation Modal */}
             <AnimatePresence>
-              {showConfirm && (
+              {showModal && (
                 <motion.div
-                  initial={{ opacity: 0, height: 0 }}
-                  animate={{ opacity: 1, height: "auto" }}
-                  exit={{ opacity: 0, height: 0 }}
-                  className="bg-[#F5F8F2] rounded-3xl p-6 shadow-sm text-[#2C3E2D]"
+                  initial={{ opacity: 0, y: 16, scale: 0.97 }}
+                  animate={{ opacity: 1, y: 0, scale: 1 }}
+                  exit={{ opacity: 0, y: 16, scale: 0.97 }}
+                  transition={{ type: "spring", damping: 25, stiffness: 300 }}
+                  className="bg-[#F5F8F2] rounded-3xl p-7 shadow-sm"
                 >
-                  <p className="text-lg font-medium mb-6">
-                    Energiyangiz aynan qayerga sizib chiqib ketayotganini aniqlaymizmi?
+                  <p className="font-serif text-xl text-[#2C3E2D] leading-relaxed mb-7">
+                    Energiyangiz aynan qayerga sizib chiqib ketayotganini
+                    aniqlaymizmi?
                   </p>
                   <div className="flex gap-3">
-                    <button 
-                      onClick={handleConfirm}
-                      className="flex-1 bg-[#49A045] hover:bg-[#3d863a] text-white py-3.5 rounded-full font-semibold transition-colors"
+                    <button
+                      onClick={confirmStart}
+                      className="flex-1 bg-[#49A045] hover:bg-[#3d8a3a] text-white py-3.5 rounded-full font-semibold transition-colors shadow-sm"
                     >
                       Ha, aniqlaymiz
                     </button>
-                    <button 
-                      onClick={() => { setShowConfirm(false); setEnergy(null); }}
+                    <button
+                      onClick={() => {
+                        setShowModal(false);
+                        setEnergy(null);
+                      }}
                       className="flex-1 bg-[#2C3E2D]/10 hover:bg-[#2C3E2D]/20 text-[#2C3E2D] py-3.5 rounded-full font-semibold transition-colors"
                     >
                       Orqaga
@@ -228,133 +253,190 @@ Javobingiz quyidagi 3 ta qismdan iborat bo'lishi shart (hech qanday salomlashish
           </motion.div>
         )}
 
-        {/* SCREEN 2: Diagnostic Cards */}
-        {started && !analysisDone && (
+        {/* ════════ SCREEN 2: DIAGNOSTIC CARDS ════════ */}
+        {step === "cards" && (
           <motion.div
             key="cards"
-            initial={{ opacity: 0, x: 20 }}
+            initial={{ opacity: 0, x: 30 }}
             animate={{ opacity: 1, x: 0 }}
-            className="flex flex-col w-full h-full"
+            exit={{ opacity: 0, x: -30 }}
+            className="px-5 flex flex-col gap-5"
           >
-            <div className="flex justify-between items-center mb-6 px-1">
-              <span className="text-white/80 text-sm font-medium">Qadam {currentCard + 1} / 3</span>
+            {/* Progress bar */}
+            <div className="flex items-center justify-between mb-1 px-1">
+              <span className="text-white/80 text-sm font-medium">
+                Qadam {currentCard + 1} / 3
+              </span>
               <div className="flex gap-1.5">
-                {[0,1,2].map(i => (
-                  <div key={i} className={`w-6 h-1.5 rounded-full ${i <= currentCard ? 'bg-white' : 'bg-white/30'}`} />
+                {[0, 1, 2].map((i) => (
+                  <div
+                    key={i}
+                    className={`h-[5px] w-7 rounded-full transition-all duration-300 ${
+                      i <= currentCard ? "bg-white" : "bg-white/25"
+                    }`}
+                  />
                 ))}
               </div>
             </div>
 
-            <div className="bg-[#F5F8F2] rounded-3xl p-8 shadow-md text-[#2C3E2D] relative flex-1 flex flex-col justify-between">
-              <div>
-                <h2 className="text-2xl font-serif font-bold mb-3">{CARDS[currentCard].author}</h2>
-                <p className="italic text-[#6B7A6A] mb-8 leading-relaxed font-serif text-lg">
-                  "{CARDS[currentCard].quote}"
-                </p>
-                <p className="font-semibold text-lg leading-snug mb-8">
-                  {CARDS[currentCard].question}
-                </p>
-              </div>
+            {/* Single Card */}
+            <motion.div
+              key={currentCard}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.35 }}
+              className="bg-[#F5F8F2] rounded-3xl p-7 sm:p-8 shadow-sm"
+            >
+              {/* Author */}
+              <h2 className="font-serif text-[26px] text-[#2C3E2D] font-semibold mb-4">
+                {CARDS[currentCard].author}
+              </h2>
 
-              <div className="relative mt-auto">
+              {/* Quote */}
+              <p className="italic text-[#6B7A6A] text-[15px] leading-relaxed mb-7 font-serif">
+                &ldquo;{CARDS[currentCard].quote}&rdquo;
+              </p>
+
+              {/* Question */}
+              <p className="text-[#2C3E2D] font-medium text-[16px] leading-snug mb-6">
+                {CARDS[currentCard].question}
+              </p>
+
+              {/* Input Area */}
+              <div className="relative">
                 <textarea
                   value={inputValue}
                   onChange={(e) => setInputValue(e.target.value)}
                   placeholder="Shu yerga yozing..."
-                  className="w-full bg-white border border-[#2C3E2D]/10 rounded-3xl p-5 pb-16 text-[#2C3E2D] placeholder-[#6B7A6A]/50 focus:outline-none focus:ring-2 focus:ring-[#49A045]/30 resize-none h-40 shadow-inner"
+                  rows={4}
+                  className="w-full bg-[#EDF2E8] rounded-2xl p-5 pr-16 text-[#2C3E2D] text-[15px] placeholder-[#6B7A6A]/50 resize-none focus:outline-none focus:ring-2 focus:ring-[#49A045]/30 transition-shadow"
                 />
                 <button
                   onClick={submitAnswer}
                   disabled={!inputValue.trim()}
-                  className="absolute bottom-4 right-4 bg-[#2C3E2D] text-white w-12 h-12 rounded-full flex items-center justify-center disabled:opacity-50 hover:bg-[#1a251b] transition-colors"
+                  className="absolute bottom-3.5 right-3.5 w-11 h-11 bg-[#2C3E2D] hover:bg-[#1e2c1f] text-white rounded-full flex items-center justify-center disabled:opacity-40 transition-all active:scale-90"
                 >
                   <ArrowUp className="w-5 h-5" />
                 </button>
               </div>
-            </div>
+            </motion.div>
           </motion.div>
         )}
 
-        {/* SCREEN 3: Analysis & Chat */}
-        {analysisDone && (
+        {/* ════════ SCREEN 3: ANALYSIS + CHAT ════════ */}
+        {step === "analysis" && (
           <motion.div
             key="analysis"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="flex flex-col w-full gap-6"
+            className="px-5 flex flex-col gap-5"
           >
-            <h1 className="text-3xl font-serif font-bold drop-shadow-sm">Tahlil Natijasi</h1>
-            
-            <div className="bg-[#F5F8F2] rounded-3xl p-6 md:p-8 shadow-md text-[#2C3E2D]">
-              {isLoading && !initialAnalysis ? (
-                <div className="flex flex-col items-center justify-center py-10 gap-4">
-                  <div className="w-8 h-8 border-4 border-[#49A045] border-t-transparent rounded-full animate-spin" />
-                  <p className="text-[#6B7A6A] font-medium text-sm animate-pulse">Kouch javob tayyorlamoqda...</p>
+            {/* Title */}
+            <h1 className="font-serif text-[28px] text-white drop-shadow-md">
+              Tahlil natijasi
+            </h1>
+
+            {/* AI Analysis Card */}
+            <div className="bg-[#F5F8F2] rounded-3xl p-7 shadow-sm">
+              {isLoading && !aiResponse ? (
+                <div className="flex flex-col items-center justify-center py-12 gap-4">
+                  <div className="w-8 h-8 border-[3px] border-[#49A045] border-t-transparent rounded-full animate-spin" />
+                  <p className="text-[#6B7A6A] text-sm font-medium animate-pulse">
+                    Kouch javob tayyorlamoqda...
+                  </p>
                 </div>
               ) : (
-                <div className="prose prose-p:leading-relaxed prose-p:mb-4 prose-strong:text-[#2C3E2D] text-[#2C3E2D] text-[15px] sm:text-base prose-headings:font-serif prose-headings:text-[#2C3E2D]">
+                <div className="prose prose-sm max-w-none text-[#2C3E2D] prose-strong:text-[#2C3E2D] prose-p:leading-relaxed prose-p:mb-3">
                   <ReactMarkdown remarkPlugins={[remarkGfm]}>
-                    {initialAnalysis || ""}
+                    {aiResponse || ""}
                   </ReactMarkdown>
+                </div>
+              )}
 
-                  <div className="mt-10 mb-2">
-                    <Link href="/oz-yolini-topish" className="w-full inline-flex items-center justify-center bg-[#49A045] hover:bg-[#3d863a] text-white py-4 rounded-full font-semibold transition-colors">
-                      Testni boshlash
-                    </Link>
-                  </div>
+              {aiResponse && (
+                <div className="mt-7 pt-5 border-t border-[#2C3E2D]/10">
+                  <Link
+                    href="/oz-yolini-topish"
+                    className="block w-full text-center bg-[#49A045] hover:bg-[#3d8a3a] text-white py-3.5 rounded-full font-semibold transition-colors shadow-sm"
+                  >
+                    🚀 Testni boshlash
+                  </Link>
                 </div>
               )}
             </div>
 
-            {/* Continuous Chat Section */}
-            {initialAnalysis && (
-              <div className="bg-[#F5F8F2] rounded-3xl p-5 shadow-md flex flex-col h-full max-h-[500px]">
-                <div className="flex items-center gap-2 mb-4 px-2">
-                  <MessageCircle className="w-5 h-5 text-[#49A045]" />
-                  <h3 className="font-serif font-bold text-[#2C3E2D] text-lg">Kouch bilan suhbat</h3>
+            {/* Ongoing Coach Chat */}
+            {aiResponse && (
+              <div className="bg-[#F5F8F2] rounded-3xl p-5 shadow-sm flex flex-col">
+                {/* Chat header */}
+                <div className="flex items-center gap-2.5 mb-4 px-1">
+                  <div className="w-8 h-8 rounded-full bg-[#49A045]/15 flex items-center justify-center">
+                    <MessageCircle className="w-4 h-4 text-[#49A045]" />
+                  </div>
+                  <h3 className="font-serif text-lg font-semibold text-[#2C3E2D]">
+                    Kouch bilan suhbat
+                  </h3>
                 </div>
 
-                <div className="flex-1 overflow-y-auto mb-4 px-2 space-y-4 no-scrollbar">
-                  {conversation.map((msg, i) => (
-                    <div key={i} className={`flex ${msg.role === "user" ? "justify-end" : "justify-start"}`}>
-                      <div className={`p-4 rounded-2xl max-w-[85%] text-sm ${
-                        msg.role === "user" 
-                          ? "bg-[#49A045] text-white rounded-br-none" 
-                          : "bg-white text-[#2C3E2D] border border-[#2C3E2D]/10 rounded-bl-none shadow-sm prose prose-sm prose-p:text-[#2C3E2D]"
-                      }`}>
-                        {msg.role === "user" ? (
-                          msg.content
-                        ) : (
-                          <ReactMarkdown remarkPlugins={[remarkGfm]}>{msg.content}</ReactMarkdown>
-                        )}
+                {/* Chat messages */}
+                {furtherChat.length > 0 && (
+                  <div className="flex flex-col gap-3 mb-4 max-h-[350px] overflow-y-auto no-scrollbar px-1">
+                    {furtherChat.map((msg, i) => (
+                      <div
+                        key={i}
+                        className={`flex ${
+                          msg.role === "user" ? "justify-end" : "justify-start"
+                        }`}
+                      >
+                        <div
+                          className={`max-w-[85%] rounded-2xl px-4 py-3 text-sm leading-relaxed ${
+                            msg.role === "user"
+                              ? "bg-[#49A045] text-white rounded-br-md"
+                              : "bg-white text-[#2C3E2D] border border-[#2C3E2D]/8 rounded-bl-md shadow-sm"
+                          }`}
+                        >
+                          {msg.role === "user" ? (
+                            msg.content
+                          ) : (
+                            <div className="prose prose-sm max-w-none prose-p:text-[#2C3E2D] prose-strong:text-[#2C3E2D]">
+                              <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                                {msg.content}
+                              </ReactMarkdown>
+                            </div>
+                          )}
+                        </div>
                       </div>
-                    </div>
-                  ))}
-                  {isLoading && conversation.length % 2 === 1 && (
-                    <div className="flex justify-start">
-                      <div className="p-4 rounded-2xl max-w-[85%] text-sm bg-white text-[#6B7A6A] border border-[#2C3E2D]/10 rounded-bl-none shadow-sm">
-                        <span className="animate-pulse">Kouch yozmoqda...</span>
+                    ))}
+                    {isLoading && (
+                      <div className="flex justify-start">
+                        <div className="rounded-2xl px-4 py-3 text-sm bg-white text-[#6B7A6A] border border-[#2C3E2D]/8 rounded-bl-md">
+                          <span className="animate-pulse">
+                            Kouch yozmoqda...
+                          </span>
+                        </div>
                       </div>
-                    </div>
-                  )}
-                </div>
+                    )}
+                    <div ref={chatEndRef} />
+                  </div>
+                )}
 
+                {/* Chat input */}
                 <div className="relative">
                   <input
                     type="text"
                     value={chatInput}
                     onChange={(e) => setChatInput(e.target.value)}
-                    onKeyDown={(e) => e.key === "Enter" && sendChatMessage()}
+                    onKeyDown={(e) => e.key === "Enter" && sendChat()}
                     placeholder="Fikringiz bormi? Shu yerda yozing..."
-                    className="w-full bg-white border border-[#2C3E2D]/20 rounded-full pl-5 pr-14 py-4 text-sm text-[#2C3E2D] placeholder-[#6B7A6A] focus:outline-none focus:ring-2 focus:ring-[#49A045]/40"
                     disabled={isLoading}
+                    className="w-full bg-[#EDF2E8] rounded-full pl-5 pr-14 py-4 text-sm text-[#2C3E2D] placeholder-[#6B7A6A]/60 focus:outline-none focus:ring-2 focus:ring-[#49A045]/30 transition-shadow disabled:opacity-60"
                   />
                   <button
-                    onClick={sendChatMessage}
+                    onClick={sendChat}
                     disabled={!chatInput.trim() || isLoading}
-                    className="absolute right-1.5 top-1.5 bg-[#49A045] text-white w-10 h-10 rounded-full flex items-center justify-center disabled:opacity-50 transition-colors"
+                    className="absolute right-1.5 top-1.5 w-10 h-10 bg-[#49A045] hover:bg-[#3d8a3a] text-white rounded-full flex items-center justify-center disabled:opacity-40 transition-all active:scale-90"
                   >
-                    <ArrowUp className="w-5 h-5" />
+                    <ArrowUp className="w-4 h-4" />
                   </button>
                 </div>
               </div>
