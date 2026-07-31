@@ -63,21 +63,21 @@ export default function Rejalarim() {
         <Link href="/" className="neu-button p-2 text-[var(--color-muted-text)] hover:text-[var(--color-foreground)]">
           <ArrowLeft className="w-6 h-6" />
         </Link>
-        <h1 className="text-xl font-bold text-[var(--color-foreground)] ml-4 drop-shadow-sm">Rejalarim</h1>
+        <h1 className="text-2xl font-bold text-[var(--color-text-dark)] ml-4 drop-shadow-sm font-serif">Rejalarim</h1>
       </div>
 
       {/* Neuroplasticity Section */}
-      <div className="neu-card p-5 mb-6 border border-[var(--color-soft-red)]/20 relative overflow-hidden">
+      <div className="neu-card p-5 mb-6 relative overflow-hidden">
         <div className="absolute top-0 right-0 p-4 opacity-10 pointer-events-none">
-          <Brain className="w-24 h-24 text-[var(--color-foreground)]" />
+          <Brain className="w-24 h-24 text-[var(--color-green-top)]" />
         </div>
         <div className="flex items-center gap-3 mb-3">
-          <div className="p-2 rounded-full bg-[var(--background)] shadow-[inset_2px_2px_5px_rgba(215,200,160,0.6),inset_-2px_-2px_5px_rgba(255,255,255,0.9)]">
-            <Brain className="w-5 h-5 text-[var(--color-soft-red)]" />
+          <div className="p-2 rounded-full bg-white shadow-sm">
+            <Brain className="w-5 h-5 text-[var(--color-green-top)]" />
           </div>
-          <h2 className="font-bold text-[var(--color-foreground)]">Neyroplastiklik</h2>
+          <h2 className="font-bold text-[var(--color-text-dark)] font-serif text-lg">Neyroplastiklik</h2>
         </div>
-        <p className="text-xs text-[var(--color-muted-text)] font-medium leading-relaxed">
+        <p className="text-xs text-[var(--color-text-muted)] font-medium leading-relaxed">
           Miyangiz har safar yangi ish qilganingizda yoki eski odatni o'zgartirganingizda 
           jismonan o'zgaradi (neyroplastiklik). Kichik qadamlar bilan reja tuzib, ularni 
           bajarish yangi, kuchli asab tolalarini shakllantiradi.
@@ -85,7 +85,7 @@ export default function Rejalarim() {
       </div>
 
       {/* Tabs */}
-      <div className="flex gap-2 mb-6 bg-[var(--background)] p-1 rounded-2xl shadow-[inset_4px_4px_10px_rgba(215,200,160,0.6),inset_-4px_-4px_10px_rgba(255,255,255,0.9)]">
+      <div className="flex gap-2 mb-6 bg-[var(--color-card)] p-1 rounded-full shadow-sm">
         {[
           { id: "kunlik", label: "Kunlik" },
           { id: "haftalik", label: "Haftalik" },
@@ -94,10 +94,10 @@ export default function Rejalarim() {
           <button
             key={tab.id}
             onClick={() => setActiveTab(tab.id as TaskType)}
-            className={`flex-1 py-2 text-xs font-bold rounded-xl transition-all ${
+            className={`flex-1 py-2 text-xs font-bold rounded-full transition-all ${
               activeTab === tab.id 
-                ? "bg-[var(--color-soft-red)] text-white shadow-md" 
-                : "text-[var(--color-muted-text)] hover:text-[var(--color-foreground)]"
+                ? "bg-[var(--color-text-dark)] text-white shadow-md" 
+                : "text-[var(--color-text-muted)] hover:text-[var(--color-text-dark)]"
             }`}
           >
             {tab.label}
@@ -113,12 +113,12 @@ export default function Rejalarim() {
           onChange={(e) => setNewTaskText(e.target.value)}
           onKeyDown={(e) => e.key === "Enter" && addTask()}
           placeholder="Yangi reja qo'shish..."
-          className="flex-1 h-12 neu-input rounded-xl px-4 text-[var(--color-foreground)] text-sm placeholder:text-[var(--color-muted-text)]/50"
+          className="flex-1 h-12 neu-input rounded-full px-4 text-[var(--color-text-dark)] text-sm placeholder:text-[var(--color-text-muted)]/50"
         />
         <button
           onClick={addTask}
           disabled={!newTaskText.trim()}
-          className="h-12 w-12 flex items-center justify-center neu-button text-[var(--color-soft-red)] rounded-xl disabled:opacity-50"
+          className="h-12 w-12 flex items-center justify-center bg-[var(--color-green-top)] text-white rounded-full disabled:opacity-50 shadow-sm active:scale-95 transition-all"
         >
           <Plus className="w-5 h-5" />
         </button>
@@ -127,7 +127,7 @@ export default function Rejalarim() {
       {/* Task List */}
       <div className="flex flex-col gap-3">
         {filteredTasks.length === 0 ? (
-          <div className="text-center py-10 text-[var(--color-muted-text)] text-sm font-medium">
+          <div className="text-center py-10 text-[var(--color-text-muted)] text-sm font-medium">
             Hozircha vazifalar yo'q. Yangi reja tuzib, ong ostingizni o'zgartirishni boshlang.
           </div>
         ) : (
@@ -140,18 +140,18 @@ export default function Rejalarim() {
                 onClick={() => toggleTask(task.id)}
                 className={`mt-0.5 flex-shrink-0 w-6 h-6 rounded-full border-2 flex items-center justify-center transition-all ${
                   task.completed 
-                    ? 'border-[var(--color-soft-red)] bg-[var(--color-soft-red)] text-white' 
-                    : 'border-[var(--color-muted-text)]/30 text-transparent'
+                    ? 'border-[var(--color-green-top)] bg-[var(--color-green-top)] text-white' 
+                    : 'border-[var(--color-text-muted)]/30 text-transparent'
                 }`}
               >
                 <Check className="w-3.5 h-3.5" />
               </button>
               
               <div className="flex-1">
-                <p className={`text-sm font-semibold text-[var(--color-foreground)] transition-all ${task.completed ? 'line-through text-[var(--color-muted-text)]' : ''}`}>
+                <p className={`text-sm font-semibold text-[var(--color-text-dark)] transition-all ${task.completed ? 'line-through text-[var(--color-text-muted)]' : ''}`}>
                   {task.text}
                 </p>
-                <div className="flex items-center gap-1.5 mt-1 text-[10px] font-bold text-[var(--color-muted-text)]">
+                <div className="flex items-center gap-1.5 mt-1 text-[10px] font-bold text-[var(--color-text-muted)]">
                   <Calendar className="w-3 h-3" />
                   <span>{task.date}</span>
                 </div>

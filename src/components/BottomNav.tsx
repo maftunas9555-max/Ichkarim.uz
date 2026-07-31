@@ -33,20 +33,20 @@ export default function BottomNav() {
                 <div className="relative">
                   <Icon
                     className={`w-6 h-6 transition-all duration-300 ${
-                      isActive ? "text-[#FFB800] scale-110 drop-shadow-sm" : "text-[#5D4E37] scale-100"
+                      isActive ? "text-[#49A045] scale-110 drop-shadow-sm" : "text-[#6B7A6A] scale-100"
                     }`}
                   />
                   {isActive && (
                     <motion.div
                       layoutId="nav-indicator"
-                      className="absolute -inset-3 bg-white/50 rounded-full blur-md -z-10"
+                      className="absolute -inset-3 bg-[#49A045]/10 rounded-full blur-md -z-10"
                       transition={{ type: "spring", stiffness: 300, damping: 30 }}
                     />
                   )}
                 </div>
                 <span
                   className={`text-xs font-bold transition-colors duration-300 mt-1 ${
-                    isActive ? "text-[#2d2d2d]" : "text-[#5D4E37]"
+                    isActive ? "text-[#2C3E2D]" : "text-[#6B7A6A]"
                   }`}
                 >
                   {item.name}

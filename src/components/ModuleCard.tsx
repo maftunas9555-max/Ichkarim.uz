@@ -34,7 +34,7 @@ export default function ModuleCard({
       whileHover={{ scale: 1.02 }}
       whileTap={{ scale: 0.98 }}
       className={cn(
-        "relative rounded-[32px] overflow-hidden bg-[#FFF3CD] cursor-pointer neu-card",
+        "relative rounded-[32px] overflow-hidden bg-[#F5F8F2] cursor-pointer neu-card",
         className
       )}
     >
@@ -48,7 +48,7 @@ export default function ModuleCard({
         </div>
         {/* Wavy SVG Divider */}
         <svg
-          className="absolute bottom-0 w-full h-8 text-[#FFF3CD] translate-y-[1px]"
+          className="absolute bottom-0 w-full h-8 text-[#F5F8F2] translate-y-[1px]"
           preserveAspectRatio="none"
           viewBox="0 0 1440 320"
         >
@@ -61,14 +61,14 @@ export default function ModuleCard({
       </div>
 
       <div className="relative pt-[115px] px-5 pb-5">
-        <h3 className="text-[19px] font-bold text-[#2d2d2d] mb-1 tracking-wide">{title}</h3>
-        <p className="text-xs text-[#5D4E37] font-medium mb-4">{subtitle}</p>
+        <h3 className="text-[19px] font-bold text-[#2C3E2D] mb-1 tracking-wide font-serif">{title}</h3>
+        <p className="text-xs text-[#6B7A6A] font-medium mb-4">{subtitle}</p>
         
-        <div className="h-[1px] w-full bg-[#5D4E37]/10 my-4"></div>
+        <div className="h-[1px] w-full bg-[#6B7A6A]/10 my-4"></div>
         
-        <div className="flex justify-between items-center text-[#FFB800] transition-colors">
+        <div className="flex justify-between items-center text-[#49A045] transition-colors">
           <span className="text-[11px] font-bold tracking-wide">{footerText}</span>
-          <div className="bg-[#FFF3CD] p-1.5 rounded-full shadow-[inset_2px_2px_5px_rgba(215,200,160,0.6),inset_-2px_-2px_5px_rgba(255,255,255,0.9)]">
+          <div className="bg-[#F5F8F2] p-1.5 rounded-full shadow-sm">
              <ChevronRight className="w-4 h-4" />
           </div>
         </div>

@@ -1,298 +1,364 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import { ArrowLeft, ArrowUp, Zap, BatteryFull, BatteryMedium, BatteryLow, MessageCircle } from "lucide-react";
+import Link from "next/link";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
-import { ArrowLeft, Activity, Send, ChevronRight } from "lucide-react";
-import Link from "next/link";
 
-// 20 questions based on Freud and Jung's theories
-const ALL_QUESTIONS = [
-  // Freud (Subconscious, Repression, Desires)
-  { text: "Oxirgi marta kimga yoki nimaga qattiq g'azablandingiz? Nega?" },
-  { text: "Tushingizda tez-tez qanday holat yoki obrazlarni ko'rasiz?" },
-  { text: "Sizni eng ko'p qo'rqitadigan narsa nima va u qachon boshlangan?" },
-  { text: "Hozir qanday istagingizni boshqalardan (va o'zingizdan) yashiryapsiz?" },
-  { text: "Bolaligingizdagi eng yorqin va yoqimsiz xotira qaysi?" },
-  { text: "Hech kim bilmaydigan, o'zingiz uyaladigan qanday siringiz bor?" },
-  { text: "Qaysi odat yoki xulq-atvoringizni o'zgartira olmayapsiz?" },
-  { text: "Boshqalarda eng yomon ko'rgan hislatingiz nima?" },
+type EnergyLevel = "100" | "50" | "10" | null;
+
+export default function DiagnostikaGreen() {
+  const [energy, setEnergy] = useState<EnergyLevel>(null);
+  const [showConfirm, setShowConfirm] = useState(false);
+  const [started, setStarted] = useState(false);
   
-  // Jung (Shadow, Archetypes, Individuation)
-  { text: "Hozir o'zingizni biror jonzotga o'xshatsangiz, u nima bo'lardi? Va nega?" },
-  { text: "O'zingizdagi qaysi 'qorong'u' yoki salbiy tomonni tan olishni xohlamaysiz (Soyangiz)?" },
-  { text: "Hayotingizdagi takrorlanayotgan xatoliklar qaysi? Ular nimani o'rgatmoqda?" },
-  { text: "Agar siz ideal inson bo'lganingizda, bugungi kuningiz qanday o'tgan bo'lardi?" },
-  { text: "O'zingizga qanday niqob (Persona) taqishni yaxshi ko'rasiz?" },
-  { text: "Kimsasiz orolda qolsangiz, birinchi navbatda nima haqida o'ylaysiz?" },
-  { text: "Hozir sizning ichingizdagi 'Bola' nimani xohlayapti?" },
-  { text: "Hayotingizning hozirgi bosqichini qaysi faslga qiyoslagan bo'lardingiz?" },
-
-  // General Deep reflection
-  { text: "Bugun nima sizdan eng ko'p energiyani tortib oldi?" },
-  { text: "O'zingizni eng ko'p qachon va kimning oldida xavfsiz his qilasiz?" },
-  { text: "Vijdonga xilof ish qilganingizni qachon ohirgi marta sezdingiz?" },
-  { text: "Hayotingizda nimani yo'qotishdan eng ko'p qo'rqasiz?" }
-];
-
-export default function Diagnostika() {
-  const [step, setStep] = useState<"intro" | "questions" | "write" | "chat">("intro");
-  const [questions, setQuestions] = useState<string[]>([]);
-  const [currentQ, setCurrentQ] = useState(0);
-  const [answers, setAnswers] = useState<string[]>([]);
-  const [currentAnswer, setCurrentAnswer] = useState("");
-  const [finalNote, setFinalNote] = useState("");
-  const [messages, setMessages] = useState<{role: "user"|"model", content: string}[]>([]);
-  const [chatInput, setChatInput] = useState("");
+  // Quiz State
+  const [answers, setAnswers] = useState<string[]>(["", "", ""]);
+  const [currentCard, setCurrentCard] = useState(0);
+  const [inputValue, setInputValue] = useState("");
+  
+  // AI/Chat state
+  const [analysisDone, setAnalysisDone] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [chatMessages, setChatMessages] = useState<{role: "user" | "model", content: string}[]>([]);
+  const [chatInput, setChatInput] = useState("");
 
-  // Pick 5 random questions on mount
-  useEffect(() => {
-    const shuffled = [...ALL_QUESTIONS].sort(() => 0.5 - Math.random());
-    setQuestions(shuffled.slice(0, 5).map(q => q.text));
-  }, []);
+  const CARDS = [
+    {
+      author: "S. Freud",
+      quote: "Inson eng ko'p energiyani o'zidan yashirgan haqiqatlariga sarflaydi.",
+      question: "Hozir hayotingizda tan olishdan qochayotgan, sizga ichki azob va qarshilik berayotgan narsa nima?"
+    },
+    {
+      author: "C. Jung",
+      quote: "Boshqalardagi bizni g'azablantiradigan xislatlar — o'zimizni anglash kalitidir.",
+      question: "Atrofingizdagilarning qaysi harakati sizning g'ashingizga tegib, quvvatingizni so'rib olyapti?"
+    },
+    {
+      author: "Asl istak",
+      quote: "Sizning qayerga qarayotganingiz emas, nima ko'rayotganingiz muhim.",
+      question: "Hech qanday to'siq (qo'rquv, pul, odamlar gapi) bo'lmaganda, ayni damdagi bor kuchingizni nima qilishga sarflardingiz?"
+    }
+  ];
 
-  const handleNextQuestion = () => {
-    if (!currentAnswer.trim()) return;
-    const newAnswers = [...answers, currentAnswer];
+  const handleSelectEnergy = (level: EnergyLevel) => {
+    setEnergy(level);
+    setShowConfirm(true);
+  };
+
+  const handleConfirm = () => {
+    setShowConfirm(false);
+    setStarted(true);
+  };
+
+  const submitAnswer = async () => {
+    if (!inputValue.trim()) return;
+    
+    const newAnswers = [...answers];
+    newAnswers[currentCard] = inputValue;
     setAnswers(newAnswers);
-    setCurrentAnswer("");
+    setInputValue("");
 
-    if (currentQ < questions.length - 1) {
-      setCurrentQ(currentQ + 1);
+    if (currentCard < 2) {
+      setCurrentCard(currentCard + 1);
     } else {
-      setStep("write");
+      // Finished all cards, generate AI analysis
+      setAnalysisDone(true);
+      await generateAnalysis(newAnswers);
     }
   };
 
-  const startAnalysis = async () => {
-    if (!finalNote.trim()) return;
+  const generateAnalysis = async (finalAnswers: string[]) => {
+    setIsLoading(true);
+    
+    const userPrompt = `
+Mening tanlagan energiyam: ${energy}%
+1. Yashirgan haqiqatim (Freyd): ${finalAnswers[0]}
+2. Meni g'azablantiradigan xislat (Yung): ${finalAnswers[1]}
+3. Asl istagim: ${finalAnswers[2]}
+`;
+    
+    const newMsgs = [{ role: "user" as const, content: userPrompt }];
+    setChatMessages(newMsgs);
+
     try {
-      setIsLoading(true);
-      setStep("chat");
-
-      const testResults = questions.map((q, i) => `Savol: ${q}\nJavob: ${answers[i]}`).join("\n\n");
-      const initialUserMsg = `Mening psixologik test javoblarim:\n${testResults}\n\nMening hozirgi holatim va fikrlarim:\n${finalNote}`;
-      
-      const newMsgs = [{ role: "user" as const, content: initialUserMsg }];
-      setMessages(newMsgs);
-
       const res = await fetch("/api/chat", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ 
           messages: newMsgs,
-          systemPrompt: `Sen kuchli, prinsipial va haqiqatni yuzga aytadigan psixoanalitik-kouchsan (Zigmund Freyd va Karl Yung yondashuvlari asosida).
-Mijozning test javoblari va hozirgi holatiga qarab, uni DIAGNOSTIKA qilasan.
-QOIDALAR:
-1. QISQA VA LONDDA yoz (150-200 so'z maksimum). Ortiqcha kirish gaplar (Salom, shunday ekan) kerak emas.
-2. Jiddiy, hatto biroz qattiqqo'l (lekin yordam beruvchi) kouch kabi gapir. "Siz hozir agressivsiz", "Siz o'zingizni aldayapsiz", "Kibringiz sizga halal beryapti" kabi OCHIQ ayt!
-3. Agar holatini aniq anglay olmasang, kouch kabi provokatsion savol ber.
-4. Aniq va amaliy YECHIM / MASLAHAT ber (nima qilishi kerakligini buyruq ohangida ayt).`
+          systemPrompt: `Siz professional va to'g'ridan-to'g'ri haqiqatni aytuvchi kouch/psixologsiz.
+Mijozning muammolarini chuqur tahlil qilib yechim bering.
+QAT'IY STRUKTURA:
+Javobingiz quyidagi 3 ta qismdan iborat bo'lishi shart (hech qanday salomlashishlarsiz):
+
+🔍 Asl muammo: [Tahlil. Nimaga energiyasi ketyapti va nega o'zini aldayapti]
+
+💡 Yechim: [C. Jung yoki Freyd arxetiplaridan foydalanib yechim. Nima qilish kerakligi haqida aniq ko'rsatma]
+
+🚀 Amaliy qadam: [Shu yerning o'zidayoq qilish kerak bo'lgan konkret 1 ta qadam]`
         }),
       });
-      
       const data = await res.json();
       if (res.ok) {
-        setMessages([...newMsgs, { role: "model", content: data.reply || data.message }]);
+        setChatMessages([...newMsgs, { role: "model", content: data.reply || data.message }]);
       }
     } catch (err) {
-      alert("Xatolik yuz berdi.");
+      console.error(err);
     } finally {
       setIsLoading(false);
     }
   };
 
-  const sendMsg = async () => {
-    const input = chatInput.trim();
-    if (!input) return;
-    const newMsgs = [...messages, { role: "user" as const, content: input }];
-    setMessages(newMsgs);
+  const sendChatMessage = async () => {
+    if (!chatInput.trim() || isLoading) return;
+    
+    const newMsgs = [...chatMessages, { role: "user" as const, content: chatInput }];
+    setChatMessages(newMsgs);
     setChatInput("");
+    setIsLoading(true);
+
     try {
-      setIsLoading(true);
       const res = await fetch("/api/chat", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ 
           messages: newMsgs,
-          systemPrompt: "Sen kouchsan. QISQA, LONDDA, TO'G'RIDAN-TO'G'RI yechim ber. Yuziga ayt."
+          systemPrompt: "Sen shaxsiy psixolog kouchsan. Mijozning savoli yoki e'tiroziga real vaqtda empatik, lekin prinsipial va konkret maslahat ber. Qisqa va lo'nda yoz."
         }),
       });
       const data = await res.json();
       if (res.ok) {
-        setMessages([...newMsgs, { role: "model", content: data.reply || data.message }]);
+        setChatMessages([...newMsgs, { role: "model", content: data.reply || data.message }]);
       }
-    } catch (e) {} finally {
+    } catch (err) {
+    } finally {
       setIsLoading(false);
     }
   };
 
+  // Find the AI response in chatMessages (it's the first model response)
+  const initialAnalysis = chatMessages.find(m => m.role === "model")?.content;
+  // Further chat is everything after index 1
+  const conversation = chatMessages.slice(2);
+
   return (
-    <div className="flex flex-col h-full px-5 pt-6 pb-24">
-      <div className="flex items-center mb-6 w-full">
-        <Link href="/" className="neu-button p-2 text-[var(--color-muted-text)] hover:text-[var(--color-foreground)]">
-          <ArrowLeft className="w-6 h-6" />
+    <div className="flex flex-col min-h-screen text-white relative w-full h-full pb-32 pt-6 px-4">
+      {/* Absolute positioning for the global gradient to ensure it's everywhere if body is not covering */}
+      <div className="fixed inset-0 bg-gradient-to-b from-[#49A045] to-[#E7F0E2] -z-10" />
+
+      {/* Header */}
+      <div className="flex items-center mb-8 relative z-10 w-full">
+        <Link href="/" className="rounded-full bg-white/20 p-2 text-white hover:bg-white/30 backdrop-blur-md transition-all">
+          <ArrowLeft className="w-5 h-5" />
         </Link>
-        <h1 className="text-xl font-bold text-[var(--color-foreground)] ml-4 drop-shadow-sm">Tezkor Diagnostika</h1>
       </div>
 
       <AnimatePresence mode="wait">
-        {step === "intro" && (
+        {/* SCREEN 1: Energy Selection */}
+        {!started && (
           <motion.div
-            key="intro"
-            initial={{ opacity: 0, x: -20 }}
-            animate={{ opacity: 1, x: 0 }}
-            exit={{ opacity: 0, x: -20 }}
-            className="flex flex-col gap-6"
+            key="energy"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -20 }}
+            className="flex flex-col w-full"
           >
-            <div className="neu-card p-6 border border-white/40 text-center">
-              <div className="flex justify-center mb-4">
-                <div className="p-4 rounded-full bg-[var(--background)] shadow-[inset_4px_4px_10px_rgba(215,200,160,0.6),inset_-4px_-4px_10px_rgba(255,255,255,0.9)]">
-                  <Activity className="w-8 h-8 text-[var(--color-soft-red)]" />
-                </div>
-              </div>
-              <h2 className="text-lg font-bold text-[var(--color-foreground)] mb-2">Miya va Ong Osti Tahlili</h2>
-              <p className="text-xs text-[var(--color-muted-text)] font-medium mb-6 leading-relaxed">
-                Bu diagnostika Freyd va Yung ta'limotiga asoslangan. Sizga 5 ta maxsus savol beriladi. Ular orqali sizning ong osti holatingiz aniqlanadi.
-              </p>
-              <button
-                onClick={() => setStep("questions")}
-                className="w-full neu-button bg-[var(--color-soft-red)] text-white py-3 rounded-full font-bold shadow-[0_4px_15px_rgba(255,184,0,0.4)] active:scale-95 transition-all"
+            <h1 className="text-4xl font-serif leading-tight mb-8 drop-shadow-md text-white">
+              Bugun ichki quvvatingiz qanday darajada?
+            </h1>
+
+            <div className="flex flex-wrap gap-3 mb-10">
+              <button 
+                onClick={() => handleSelectEnergy("100")}
+                className={`px-5 py-3 rounded-full font-medium text-[15px] flex items-center gap-2 transition-all ${
+                  energy === "100" ? "bg-white text-[#49A045] shadow-lg scale-105" : "bg-white/20 text-white backdrop-blur-md border border-white/10"
+                }`}
               >
-                Testni Boshlash
+                <Zap className="w-4 h-4" /> 100%
+              </button>
+              <button 
+                onClick={() => handleSelectEnergy("50")}
+                className={`px-5 py-3 rounded-full font-medium text-[15px] flex items-center gap-2 transition-all ${
+                  energy === "50" ? "bg-white text-[#49A045] shadow-lg scale-105" : "bg-white/20 text-white backdrop-blur-md border border-white/10"
+                }`}
+              >
+                <BatteryMedium className="w-4 h-4" /> 50%
+              </button>
+              <button 
+                onClick={() => handleSelectEnergy("10")}
+                className={`px-5 py-3 rounded-full font-medium text-[15px] flex items-center gap-2 transition-all ${
+                  energy === "10" ? "bg-white text-[#49A045] shadow-lg scale-105" : "bg-white/20 text-white backdrop-blur-md border border-white/10"
+                }`}
+              >
+                <BatteryLow className="w-4 h-4" /> 10%
               </button>
             </div>
-          </motion.div>
-        )}
 
-        {step === "questions" && (
-          <motion.div
-            key="questions"
-            initial={{ opacity: 0, x: 20 }}
-            animate={{ opacity: 1, x: 0 }}
-            exit={{ opacity: 0, x: -20 }}
-            className="flex flex-col gap-6"
-          >
-            <div className="neu-card p-6 border border-white/40">
-              <div className="flex justify-between items-center mb-4">
-                <span className="text-xs font-bold text-[var(--color-soft-red)] uppercase tracking-wider">
-                  Savol {currentQ + 1} / 5
-                </span>
-                <div className="flex gap-1">
-                  {[0, 1, 2, 3, 4].map((i) => (
-                    <div key={i} className={`h-1.5 w-4 rounded-full ${i <= currentQ ? 'bg-[var(--color-soft-red)]' : 'bg-black/10'}`} />
-                  ))}
-                </div>
-              </div>
-              
-              <h3 className="text-[17px] font-bold text-[var(--color-foreground)] mb-6 leading-relaxed">
-                {questions[currentQ]}
-              </h3>
-
-              <textarea
-                value={currentAnswer}
-                onChange={(e) => setCurrentAnswer(e.target.value)}
-                placeholder="Rostini yozing..."
-                className="w-full h-32 p-4 neu-input text-sm text-[var(--color-foreground)] placeholder:text-[var(--color-muted-text)]/50 resize-none rounded-2xl mb-4"
-              />
-
-              <button
-                onClick={handleNextQuestion}
-                disabled={!currentAnswer.trim()}
-                className="w-full neu-button bg-[var(--color-soft-red)] text-white py-3 rounded-full font-bold flex items-center justify-center gap-2 disabled:opacity-50"
-              >
-                Keyingisi <ChevronRight className="w-4 h-4" />
-              </button>
-            </div>
-          </motion.div>
-        )}
-
-        {step === "write" && (
-          <motion.div
-            key="write"
-            initial={{ opacity: 0, x: 20 }}
-            animate={{ opacity: 1, x: 0 }}
-            exit={{ opacity: 0, x: -20 }}
-            className="flex flex-col gap-6"
-          >
-            <div className="neu-card p-6 border border-white/40 text-center">
-              <h2 className="text-lg font-bold text-[var(--color-foreground)] mb-2">So'nggi Qadam</h2>
-              <p className="text-xs text-[var(--color-muted-text)] font-medium mb-4">
-                Hozirgi holatingiz (qanday his qilayotganingiz, nima qiynayotgani) haqida qisqacha yozing.
-              </p>
-
-              <textarea
-                value={finalNote}
-                onChange={(e) => setFinalNote(e.target.value)}
-                placeholder="Men o'zimni shunday his qilyapman..."
-                className="w-full h-32 p-4 neu-input text-sm text-[var(--color-foreground)] placeholder:text-[var(--color-muted-text)]/50 resize-none rounded-2xl mb-4"
-                disabled={isLoading}
-              />
-
-              <button
-                onClick={startAnalysis}
-                disabled={isLoading || !finalNote.trim()}
-                className="w-full neu-button bg-[var(--color-soft-red)] text-white py-3 rounded-full font-bold flex items-center justify-center gap-2 disabled:opacity-50"
-              >
-                {isLoading ? "Tahlil qilinmoqda..." : "Kouch Tahlilini Olish"}
-              </button>
-            </div>
-          </motion.div>
-        )}
-
-        {step === "chat" && (
-          <motion.div
-            key="chat"
-            initial={{ opacity: 0, scale: 0.95, y: 20 }}
-            animate={{ opacity: 1, scale: 1, y: 0 }}
-            className="flex flex-col h-[calc(100vh-180px)] gap-4"
-          >
-            <div className="flex-1 overflow-y-auto flex flex-col gap-4 py-2 no-scrollbar">
-              {messages.map((msg, idx) => (
-                <div
-                  key={idx}
-                  className={`flex ${msg.role === "user" ? "justify-end" : "justify-start"}`}
+            <AnimatePresence>
+              {showConfirm && (
+                <motion.div
+                  initial={{ opacity: 0, height: 0 }}
+                  animate={{ opacity: 1, height: "auto" }}
+                  exit={{ opacity: 0, height: 0 }}
+                  className="bg-[#F5F8F2] rounded-3xl p-6 shadow-sm text-[#2C3E2D]"
                 >
-                  <div
-                    className={`max-w-[85%] rounded-2xl p-4 text-sm leading-relaxed ${
-                      msg.role === "user"
-                        ? "bg-[var(--color-soft-red)] text-white shadow-md rounded-br-sm"
-                        : "neu-card border border-white/40 text-[var(--color-foreground)] rounded-bl-sm prose prose-sm prose-p:text-[var(--color-foreground)]"
-                    }`}
-                  >
-                    <ReactMarkdown remarkPlugins={[remarkGfm]}>{msg.content}</ReactMarkdown>
+                  <p className="text-lg font-medium mb-6">
+                    Energiyangiz aynan qayerga sizib chiqib ketayotganini aniqlaymizmi?
+                  </p>
+                  <div className="flex gap-3">
+                    <button 
+                      onClick={handleConfirm}
+                      className="flex-1 bg-[#49A045] hover:bg-[#3d863a] text-white py-3.5 rounded-full font-semibold transition-colors"
+                    >
+                      Ha, aniqlaymiz
+                    </button>
+                    <button 
+                      onClick={() => { setShowConfirm(false); setEnergy(null); }}
+                      className="flex-1 bg-[#2C3E2D]/10 hover:bg-[#2C3E2D]/20 text-[#2C3E2D] py-3.5 rounded-full font-semibold transition-colors"
+                    >
+                      Orqaga
+                    </button>
                   </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </motion.div>
+        )}
+
+        {/* SCREEN 2: Diagnostic Cards */}
+        {started && !analysisDone && (
+          <motion.div
+            key="cards"
+            initial={{ opacity: 0, x: 20 }}
+            animate={{ opacity: 1, x: 0 }}
+            className="flex flex-col w-full h-full"
+          >
+            <div className="flex justify-between items-center mb-6 px-1">
+              <span className="text-white/80 text-sm font-medium">Qadam {currentCard + 1} / 3</span>
+              <div className="flex gap-1.5">
+                {[0,1,2].map(i => (
+                  <div key={i} className={`w-6 h-1.5 rounded-full ${i <= currentCard ? 'bg-white' : 'bg-white/30'}`} />
+                ))}
+              </div>
+            </div>
+
+            <div className="bg-[#F5F8F2] rounded-3xl p-8 shadow-md text-[#2C3E2D] relative flex-1 flex flex-col justify-between">
+              <div>
+                <h2 className="text-2xl font-serif font-bold mb-3">{CARDS[currentCard].author}</h2>
+                <p className="italic text-[#6B7A6A] mb-8 leading-relaxed font-serif text-lg">
+                  "{CARDS[currentCard].quote}"
+                </p>
+                <p className="font-semibold text-lg leading-snug mb-8">
+                  {CARDS[currentCard].question}
+                </p>
+              </div>
+
+              <div className="relative mt-auto">
+                <textarea
+                  value={inputValue}
+                  onChange={(e) => setInputValue(e.target.value)}
+                  placeholder="Shu yerga yozing..."
+                  className="w-full bg-white border border-[#2C3E2D]/10 rounded-3xl p-5 pb-16 text-[#2C3E2D] placeholder-[#6B7A6A]/50 focus:outline-none focus:ring-2 focus:ring-[#49A045]/30 resize-none h-40 shadow-inner"
+                />
+                <button
+                  onClick={submitAnswer}
+                  disabled={!inputValue.trim()}
+                  className="absolute bottom-4 right-4 bg-[#2C3E2D] text-white w-12 h-12 rounded-full flex items-center justify-center disabled:opacity-50 hover:bg-[#1a251b] transition-colors"
+                >
+                  <ArrowUp className="w-5 h-5" />
+                </button>
+              </div>
+            </div>
+          </motion.div>
+        )}
+
+        {/* SCREEN 3: Analysis & Chat */}
+        {analysisDone && (
+          <motion.div
+            key="analysis"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="flex flex-col w-full gap-6"
+          >
+            <h1 className="text-3xl font-serif font-bold drop-shadow-sm">Tahlil Natijasi</h1>
+            
+            <div className="bg-[#F5F8F2] rounded-3xl p-6 md:p-8 shadow-md text-[#2C3E2D]">
+              {isLoading && !initialAnalysis ? (
+                <div className="flex flex-col items-center justify-center py-10 gap-4">
+                  <div className="w-8 h-8 border-4 border-[#49A045] border-t-transparent rounded-full animate-spin" />
+                  <p className="text-[#6B7A6A] font-medium text-sm animate-pulse">Kouch javob tayyorlamoqda...</p>
                 </div>
-              ))}
-              {isLoading && (
-                <div className="flex justify-start">
-                  <div className="max-w-[85%] rounded-2xl p-4 text-sm neu-card border border-white/40 text-[var(--color-muted-text)] rounded-bl-sm">
-                    Tahlil qilinmoqda...
+              ) : (
+                <div className="prose prose-p:leading-relaxed prose-p:mb-4 prose-strong:text-[#2C3E2D] text-[#2C3E2D] text-[15px] sm:text-base prose-headings:font-serif prose-headings:text-[#2C3E2D]">
+                  <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                    {initialAnalysis || ""}
+                  </ReactMarkdown>
+
+                  <div className="mt-10 mb-2">
+                    <Link href="/oz-yolini-topish" className="w-full inline-flex items-center justify-center bg-[#49A045] hover:bg-[#3d863a] text-white py-4 rounded-full font-semibold transition-colors">
+                      Testni boshlash
+                    </Link>
                   </div>
                 </div>
               )}
             </div>
 
-            <div className="pt-2 flex items-center gap-2">
-              <input
-                type="text"
-                value={chatInput}
-                onChange={(e) => setChatInput(e.target.value)}
-                onKeyDown={(e) => e.key === "Enter" && !isLoading && sendMsg()}
-                placeholder="Javob yozing..."
-                className="flex-1 h-12 neu-input rounded-full px-4 text-[var(--color-foreground)] text-sm placeholder:text-[var(--color-muted-text)]/50"
-                disabled={isLoading}
-              />
-              <button
-                disabled={isLoading || !chatInput.trim()}
-                onClick={sendMsg}
-                className="h-12 w-12 flex items-center justify-center neu-button text-[var(--color-soft-red)] rounded-full disabled:opacity-50"
-              >
-                <Send className="w-5 h-5" />
-              </button>
-            </div>
+            {/* Continuous Chat Section */}
+            {initialAnalysis && (
+              <div className="bg-[#F5F8F2] rounded-3xl p-5 shadow-md flex flex-col h-full max-h-[500px]">
+                <div className="flex items-center gap-2 mb-4 px-2">
+                  <MessageCircle className="w-5 h-5 text-[#49A045]" />
+                  <h3 className="font-serif font-bold text-[#2C3E2D] text-lg">Kouch bilan suhbat</h3>
+                </div>
+
+                <div className="flex-1 overflow-y-auto mb-4 px-2 space-y-4 no-scrollbar">
+                  {conversation.map((msg, i) => (
+                    <div key={i} className={`flex ${msg.role === "user" ? "justify-end" : "justify-start"}`}>
+                      <div className={`p-4 rounded-2xl max-w-[85%] text-sm ${
+                        msg.role === "user" 
+                          ? "bg-[#49A045] text-white rounded-br-none" 
+                          : "bg-white text-[#2C3E2D] border border-[#2C3E2D]/10 rounded-bl-none shadow-sm prose prose-sm prose-p:text-[#2C3E2D]"
+                      }`}>
+                        {msg.role === "user" ? (
+                          msg.content
+                        ) : (
+                          <ReactMarkdown remarkPlugins={[remarkGfm]}>{msg.content}</ReactMarkdown>
+                        )}
+                      </div>
+                    </div>
+                  ))}
+                  {isLoading && conversation.length % 2 === 1 && (
+                    <div className="flex justify-start">
+                      <div className="p-4 rounded-2xl max-w-[85%] text-sm bg-white text-[#6B7A6A] border border-[#2C3E2D]/10 rounded-bl-none shadow-sm">
+                        <span className="animate-pulse">Kouch yozmoqda...</span>
+                      </div>
+                    </div>
+                  )}
+                </div>
+
+                <div className="relative">
+                  <input
+                    type="text"
+                    value={chatInput}
+                    onChange={(e) => setChatInput(e.target.value)}
+                    onKeyDown={(e) => e.key === "Enter" && sendChatMessage()}
+                    placeholder="Fikringiz bormi? Shu yerda yozing..."
+                    className="w-full bg-white border border-[#2C3E2D]/20 rounded-full pl-5 pr-14 py-4 text-sm text-[#2C3E2D] placeholder-[#6B7A6A] focus:outline-none focus:ring-2 focus:ring-[#49A045]/40"
+                    disabled={isLoading}
+                  />
+                  <button
+                    onClick={sendChatMessage}
+                    disabled={!chatInput.trim() || isLoading}
+                    className="absolute right-1.5 top-1.5 bg-[#49A045] text-white w-10 h-10 rounded-full flex items-center justify-center disabled:opacity-50 transition-colors"
+                  >
+                    <ArrowUp className="w-5 h-5" />
+                  </button>
+                </div>
+              </div>
+            )}
           </motion.div>
         )}
       </AnimatePresence>

@@ -43,10 +43,10 @@ export default function Energiya() {
   return (
     <div className="flex flex-col min-h-screen px-5 pt-6 pb-24">
       <div className="flex items-center mb-6">
-        <Link href="/" className="neu-button p-2 text-[var(--color-muted-text)] hover:text-[var(--color-foreground)]">
+        <Link href="/" className="neu-button p-2 text-[var(--color-text-muted)] hover:text-[var(--color-text-dark)]">
           <ArrowLeft className="w-6 h-6" />
         </Link>
-        <h1 className="text-xl font-bold text-[var(--color-foreground)] ml-4 drop-shadow-sm">Energiya</h1>
+        <h1 className="text-2xl font-bold text-[var(--color-text-dark)] ml-4 drop-shadow-sm font-serif">Energiya</h1>
       </div>
 
       <div className="flex flex-col items-center justify-center mb-8 mt-4">
@@ -76,17 +76,17 @@ export default function Energiya() {
       </div>
 
       <div className="flex-1 flex flex-col gap-3">
-        <label className="text-sm font-bold text-[var(--color-foreground)] ml-2">
+        <label className="text-sm font-bold text-[var(--color-text-dark)] ml-2">
           Miyangizni tozalang:
         </label>
-        <p className="text-xs text-[var(--color-muted-text)] font-medium ml-2 mb-1">
+        <p className="text-xs text-[var(--color-text-muted)] font-medium ml-2 mb-1">
           Bugun qanday negativ voqealar yoki o'y-hayollar sizni qiynadi? Hammasini yozib qoldiring.
         </p>
         <textarea
           value={thoughts}
           onChange={(e) => setThoughts(e.target.value)}
           placeholder="Hammasi yomg'irday yog'ib keldi, asablarim chidamyapti..."
-          className="w-full flex-1 min-h-[200px] p-5 neu-input text-sm text-[var(--color-foreground)] placeholder:text-[var(--color-muted-text)]/50 resize-none rounded-2xl"
+          className="w-full flex-1 min-h-[200px] p-5 neu-input text-sm text-[var(--color-text-dark)] placeholder:text-[var(--color-text-muted)]/50 resize-none rounded-3xl"
         />
         
         <button
@@ -95,7 +95,7 @@ export default function Energiya() {
             setEnergyLevel(100);
           }}
           disabled={!thoughts}
-          className="mt-2 w-full neu-button bg-[var(--color-foreground)] text-[var(--background)] py-4 rounded-xl font-bold flex items-center justify-center gap-2 disabled:opacity-50"
+          className="mt-2 w-full bg-[var(--color-text-dark)] text-white py-4 rounded-full font-bold flex items-center justify-center gap-2 disabled:opacity-50 shadow-md active:scale-95 transition-all"
         >
           Tozalash va Energiyani Tiklash
         </button>

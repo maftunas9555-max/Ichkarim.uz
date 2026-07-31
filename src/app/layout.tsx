@@ -1,13 +1,19 @@
 import type { Metadata } from "next";
-import { Poppins } from "next/font/google";
+import { Inter, Playfair_Display } from "next/font/google";
 import "./globals.css";
 import BottomNav from "@/components/BottomNav";
 import Header from "@/components/Header";
 import KeepAlive from "@/components/KeepAlive";
 import SessionProvider from "@/components/SessionProvider";
 
-const poppins = Poppins({
-  variable: "--font-poppins-sans",
+const inter = Inter({
+  variable: "--font-inter-sans",
+  weight: ["400", "500", "600", "700"],
+  subsets: ["latin"],
+});
+
+const playfair = Playfair_Display({
+  variable: "--font-playfair-serif",
   weight: ["400", "500", "600", "700"],
   subsets: ["latin"],
 });
@@ -25,12 +31,12 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${poppins.variable} font-sans h-full antialiased`}
+      className={`${inter.variable} ${playfair.variable} font-sans h-full antialiased`}
     >
-      <body className="min-h-full flex justify-center bg-[#FFF3CD]">
+      <body className="bg-gradient-to-b from-[#49A045] to-[#E7F0E2] min-h-screen text-[#2C3E2D] font-sans flex justify-center">
         <SessionProvider>
           <KeepAlive />
-          <div className="w-full max-w-md bg-transparent min-h-screen relative overflow-hidden flex flex-col shadow-[0_0_50px_rgba(215,200,160,0.5)]">
+          <div className="w-full max-w-md bg-transparent min-h-screen relative overflow-hidden flex flex-col">
             <Header />
             <main className="flex-1 overflow-y-auto no-scrollbar pb-24 pt-16">
               {children}
