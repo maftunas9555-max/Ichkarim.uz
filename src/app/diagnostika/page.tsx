@@ -9,26 +9,57 @@ import remarkGfm from "remark-gfm";
 
 type Step = "energy" | "cards" | "analysis";
 
-const CARDS = [
+const CARDS_50 = [
   {
     author: "S. Freud",
     quote: "Inson eng ko\u2018p energiyani o\u2018zidan yashirgan haqiqatlariga sarflaydi.",
-    question:
-      "Hozir hayotingizda tan olishdan qochayotgan, sizga ichki azob va qarshilik berayotgan narsa nima?",
+    question: "Hozir hayotingizda tan olishdan qochayotgan, sizga ichki azob va qarshilik berayotgan narsa nima?",
   },
   {
     author: "C. Jung",
-    quote:
-      "Boshqalardagi bizni g\u2018azablantiradigan xislatlar \u2014 o\u2018zimizni anglash kalitidir.",
-    question:
-      "Atrofingizdagilarning qaysi harakati sizning g\u2018ashingizga tegib, quvvatingizni so\u2018rib olyapti?",
+    quote: "Boshqalardagi bizni g\u2018azablantiradigan xislatlar \u2014 o\u2018zimizni anglash kalitidir.",
+    question: "Atrofingizdagilarning qaysi harakati sizning g\u2018ashingizga tegib, quvvatingizni so\u2018rib olyapti?",
   },
   {
     author: "Asl istak",
-    quote:
-      "Sizning qayerga qarayotganingiz emas, nima ko\u2018rayotganingiz muhim.",
-    question:
-      "Hech qanday to\u2018siq (qo\u2018rquv, pul, odamlar gapi) bo\u2018lmaganda, ayni damdagi bor kuchingizni nima qilishga sarflardingiz?",
+    quote: "Sizning qayerga qarayotganingiz emas, nima ko\u2018rayotganingiz muhim.",
+    question: "Hech qanday to\u2018siq (qo\u2018rquv, pul, odamlar gapi) bo\u2018lmaganda, ayni damdagi bor kuchingizni nima qilishga sarflardingiz?",
+  },
+];
+
+const CARDS_100 = [
+  {
+    author: "Maqsad va Potensial",
+    quote: "Katta kuch katta mas'uliyat talab qiladi.",
+    question: "Hozirgi baland quvvatingizni o'zingiz uzoq vaqtdan beri orzu qilgan, lekin boshlashga jur'at etolmagan qaysi ishingizga yo'naltirishni xohlaysiz?",
+  },
+  {
+    author: "Atrof-muhit va Soya",
+    quote: "Quvvat noto'g'ri joyga yo'naltirilsa xavotirga aylanadi.",
+    question: "Quvvatingiz yuqori bo'lganida, atrofingizdagi qaysi toifa insonlar yoki vaziyatlar bu energiyangizni bekorchi narsalarga chalg'itishga urinayotgandek tuyuladi?",
+  },
+  {
+    author: "Asl Xohish",
+    quote: "Sizning qayerga qarayotganingiz emas, nima ko\u2018rayotganingiz muhim.",
+    question: "Tasavvur qiling, ayni damdagi barcha imkoniyat va kuchingiz bilan hayotingizda faqat bitta katta o'zgarish qilishingiz mumkin. Bu qanday o'zgarish bo'lardi?",
+  },
+];
+
+const CARDS_10 = [
+  {
+    author: "Tugallanmagan Gestalt",
+    quote: "Aytilmagan gaplar va chala ishlar insonni ichidan yemirib boradi.",
+    question: "Biz ko'pincha o'tmishdagi aytilmay qolgan gaplar va yakunlanmagan ishlarga quvvatimizni berib qo'yamiz. Hozir sizning xayolingizning bir chekkasida turib olgan va sizni qo'yib yubormayotgan o'sha 'chala ish' nima?",
+  },
+  {
+    author: "Chegaralar va Persona",
+    quote: "Boshqalarga 'ha' deyishdan oldin, o'zingizga 'yo'q' demayotganingizga ishonch hosil qiling.",
+    question: "Qaysi vaziyatda yoki kimning oldida siz o'zingizning asl xohishlaringizni chetga surib, ularga yoqish yoki ularni xafa qilmaslik uchun 'yaxshi inson' niqobini taqishga majbur bo'lyapsiz?",
+  },
+  {
+    author: "O'ziga g'amxo'rlik",
+    quote: "O'zingizni asrash — xudbinlik emas, balki tirik qolish shartidir.",
+    question: "Agar hozir tanangiz va ruhiyatigiz tilga kirganda, quvvatingizni qayta tiklash uchun sizdan eng birinchi bo'lib qaysi odatdan yoki majburiyatdan voz kechishingizni so'ragan bo'lardi?",
   },
 ];
 
@@ -255,8 +286,7 @@ QOIDALAR:
                   className="bg-[#F5F8F2] rounded-3xl p-7 shadow-sm"
                 >
                   <p className="font-serif text-xl text-[#2C3E2D] leading-relaxed mb-7">
-                    Energiyangiz aynan qayerga sizib chiqib ketayotganini
-                    aniqlaymizmi?
+                    Energiyangizni qayerga sarflayotganingni aniqlaymizmi?
                   </p>
                   <div className="flex gap-3">
                     <button
@@ -315,20 +345,23 @@ QOIDALAR:
               transition={{ duration: 0.35 }}
               className="bg-[#F5F8F2] rounded-3xl p-7 sm:p-8 shadow-sm"
             >
-              {/* Author */}
-              <h2 className="font-serif text-[26px] text-[#2C3E2D] font-semibold mb-4">
-                {CARDS[currentCard].author}
-              </h2>
-
-              {/* Quote */}
-              <p className="italic text-[#6B7A6A] text-[15px] leading-relaxed mb-7 font-serif">
-                &ldquo;{CARDS[currentCard].quote}&rdquo;
-              </p>
-
-              {/* Question */}
-              <p className="text-[#2C3E2D] font-medium text-[16px] leading-snug mb-6">
-                {CARDS[currentCard].question}
-              </p>
+              {(() => {
+                const activeCards = energy === "100" ? CARDS_100 : energy === "10" ? CARDS_10 : CARDS_50;
+                const card = activeCards[currentCard];
+                return (
+                  <>
+                    <h2 className="font-serif text-[26px] text-[#2C3E2D] font-semibold mb-4">
+                      {card.author}
+                    </h2>
+                    <p className="italic text-[#6B7A6A] text-[15px] leading-relaxed mb-7 font-serif">
+                      &ldquo;{card.quote}&rdquo;
+                    </p>
+                    <p className="text-[#2C3E2D] font-medium text-[16px] leading-snug mb-6">
+                      {card.question}
+                    </p>
+                  </>
+                );
+              })()}
 
               {/* Input Area */}
               <div className="relative">
@@ -396,7 +429,7 @@ QOIDALAR:
                     >
                       <div>
                         <p className="font-bold text-sm">🎙 Podkastlar eshitish</p>
-                        <p className="text-[12px] text-[#6B7A6A] mt-1">Ruhiyat va balans (Amira Rashidova, Barno Mukimova)</p>
+                        <p className="text-[12px] text-[#6B7A6A] mt-1">Shaxsiyatni o'stiruvchi podcastlar</p>
                       </div>
                       <span className="text-xl">→</span>
                     </a>
@@ -412,18 +445,6 @@ QOIDALAR:
                       </div>
                       <span className="text-xl">→</span>
                     </Link>
-
-                    {/* Option 3: Continue Chat */}
-                    <button
-                      onClick={() => chatEndRef.current?.scrollIntoView({ behavior: 'smooth' })}
-                      className="w-full text-left bg-[#2C3E2D] hover:bg-[#1e2c1f] text-white p-4 rounded-2xl transition-colors shadow-sm flex items-center justify-between"
-                    >
-                      <div>
-                        <p className="font-bold text-sm">💬 Kouch bilan suhbat</p>
-                        <p className="text-[12px] text-white/80 mt-1">Suhbatni pastda davom ettirish</p>
-                      </div>
-                      <span className="text-xl">↓</span>
-                    </button>
                   </div>
                 </div>
               )}
@@ -438,7 +459,7 @@ QOIDALAR:
                     <MessageCircle className="w-4 h-4 text-[#49A045]" />
                   </div>
                   <h3 className="font-serif text-lg font-semibold text-[#2C3E2D]">
-                    Kouch bilan suhbat
+                    Suhbatni davom ettirish
                   </h3>
                 </div>
 

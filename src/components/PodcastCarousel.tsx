@@ -114,13 +114,15 @@ export default function PodcastCarousel() {
       </div>
 
       {/* Indicators */}
-      <div className="flex justify-center gap-1.5 pb-3">
+      <div className="flex justify-center gap-1.5 pb-3 relative z-10">
         {PODCASTS.map((_, idx) => (
-          <div
+          <button
             key={idx}
+            onClick={() => setCurrentIndex(idx)}
             className={`h-1.5 rounded-full transition-all duration-300 ${
-              idx === currentIndex ? "w-4 bg-[#49A045]" : "w-1.5 bg-[#49A045]/20"
+              idx === currentIndex ? "w-4 bg-[#49A045]" : "w-1.5 bg-[#49A045]/20 hover:bg-[#49A045]/40"
             }`}
+            aria-label={`Go to slide ${idx + 1}`}
           />
         ))}
       </div>

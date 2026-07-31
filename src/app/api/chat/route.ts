@@ -1,12 +1,13 @@
 import { NextRequest, NextResponse } from "next/server";
-import { GoogleGenerativeAI } from "@google/generative-ai";
 
 const GLOBAL_RULES = `
 
 QATTIQ QOIDALAR (har doim amal qil):
 - Javob O'ZBEK tilida bo'lsin.
+- Har bir insonga individual kouch kabi chuqur yondash.
+- Agar insonning javobi qisqa, yuzaki bo'lsa yoki o'zini to'liq ochmagan bo'lsa, birdaniga xulosa qilib maslahat berma! Buning o'rniga uni to'liq ochiltiruvchi, ichki holatini va "ichidagi inson" nima deyotganini anglashga yordam beradigan OCHIQ savollar ber.
 - QISQA va ANIQ yoz. Maksimum 150-200 so'z.
-- Faqat: 1) Muammo nima. 2) Amaliy yechim yoki vazifa.
+- Faqat: 1) Muammo nima ekanligini his qilganingni aytish. 2) Yoki bitta kuchli savol berish, yoki amaliy yechim.
 - Ortiqcha kirish gap, falsafa, va muallif nomlarini yozma.
 - Markdown ishlatib yoz (bold, bullet points).`;
 
@@ -18,37 +19,83 @@ export async function POST(req: Request) {
     const defaultPrompt = "Siz empatiyaga boy psixolog-maslahatchisiz.";
     const finalSystemPrompt = (systemPrompt || defaultPrompt) + GLOBAL_RULES;
 
-    const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY!);
-    const model = genAI.getGenerativeModel({
-      model: "gemini-2.0-flash",
-      systemInstruction: finalSystemPrompt,
-    });
-
-    // Support both single message and messages array
-    let history: { role: string; parts: { text: string }[] }[] = [];
-    let lastMessage = "";
+    // Build conversation contents
+    const contents: { role: string; parts: { text: string }[] }[] = [];
 
     if (messages && Array.isArray(messages) && messages.length > 0) {
-      history = messages.slice(0, -1).map((msg: any) => ({
-        role: msg.role === "user" ? "user" : "model",
-        parts: [{ text: msg.content }],
-      }));
-      lastMessage = messages[messages.length - 1].content;
+      for (const msg of messages) {
+        contents.push({
+          role: msg.role === "user" ? "user" : "model",
+          parts: [{ text: msg.content }],
+        });
+      }
     } else if (message) {
-      lastMessage = message;
+      contents.push({
+        role: "user",
+        parts: [{ text: message }],
+      });
     } else {
       return NextResponse.json({ error: "Xabar talab qilinadi" }, { status: 400 });
     }
 
-    const chat = model.startChat({ history });
-    const result = await chat.sendMessage(lastMessage);
-    const responseText = result.response.text();
+    const API_KEY = process.env.GEMINI_API_KEY;
+    if (!API_KEY) {
+      return NextResponse.json({ error: "GEMINI_API_KEY topilmadi" }, { status: 500 });
+    }
 
-    return NextResponse.json({ reply: responseText, message: responseText }, { status: 200 });
+    // Try multiple models in order of preference
+    const MODELS = [
+      "gemini-2.0-flash",
+      "gemini-1.5-flash",
+      "gemini-1.5-flash-latest",
+      "gemini-pro",
+    ];
+
+    let lastError = "";
+
+    for (const modelName of MODELS) {
+      try {
+        const url = `https://generativelanguage.googleapis.com/v1beta/models/${modelName}:generateContent?key=${API_KEY}`;
+
+        const res = await fetch(url, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            system_instruction: {
+              parts: [{ text: finalSystemPrompt }],
+            },
+            contents,
+            generationConfig: {
+              temperature: 0.8,
+              maxOutputTokens: 1024,
+            },
+          }),
+        });
+
+        if (res.ok) {
+          const data = await res.json();
+          const text = data?.candidates?.[0]?.content?.parts?.[0]?.text;
+          if (text) {
+            return NextResponse.json({ reply: text, message: text }, { status: 200 });
+          }
+          lastError = "AI javob qaytarmadi";
+        } else {
+          const errData = await res.json().catch(() => ({}));
+          lastError = errData?.error?.message || `Model ${modelName}: ${res.status}`;
+          // If 404, try next model
+          if (res.status === 404) continue;
+          // For other errors (like auth), don't try more models
+          break;
+        }
+      } catch (e: any) {
+        lastError = e?.message || "Tarmoq xatosi";
+        continue;
+      }
+    }
+
+    return NextResponse.json({ error: `AI xatosi: ${lastError}` }, { status: 500 });
   } catch (error: any) {
-    console.error("Gemini API Xatosi:", error?.message || error);
-    const errorMsg = error?.message || "Noma'lum xatolik";
-    return NextResponse.json({ error: `Serverda xatolik: ${errorMsg}` }, { status: 500 });
+    console.error("API Xatosi:", error?.message || error);
+    return NextResponse.json({ error: `Serverda xatolik: ${error?.message || "Noma'lum"}` }, { status: 500 });
   }
 }
-
