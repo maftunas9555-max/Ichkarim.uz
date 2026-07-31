@@ -20,7 +20,7 @@ export async function POST(req: Request) {
 
     const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY!);
     const model = genAI.getGenerativeModel({
-      model: "gemini-1.5-flash",
+      model: "gemini-2.0-flash-lite",
       systemInstruction: finalSystemPrompt,
     });
 
@@ -46,8 +46,9 @@ export async function POST(req: Request) {
 
     return NextResponse.json({ reply: responseText, message: responseText }, { status: 200 });
   } catch (error: any) {
-    console.error("Gemini API Xatosi:", error);
-    return NextResponse.json({ error: "Serverda xatolik yuz berdi" }, { status: 500 });
+    console.error("Gemini API Xatosi:", error?.message || error);
+    const errorMsg = error?.message || "Noma'lum xatolik";
+    return NextResponse.json({ error: `Serverda xatolik: ${errorMsg}` }, { status: 500 });
   }
 }
 
