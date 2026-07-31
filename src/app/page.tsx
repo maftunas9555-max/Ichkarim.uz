@@ -73,18 +73,6 @@ export default function Home() {
 
       <div className="flex flex-col gap-5">
         
-        {/* 2. Energiya (Yangi Soya o'rniga) */}
-        <Link href="/energiya" className="block w-full">
-          <ModuleCard
-            delay={0.2}
-            title="Energiyangizni Yo'naltiring"
-            subtitle="Diqqat va resurs tahlili"
-            footerText="Freyd va Yung yondashuvi"
-            pillText="Tahlil"
-            icon={<Zap className="w-6 h-6" />}
-            colorClass="bg-[#2C3E2D]"
-          />
-        </Link>
 
         {/* 3. Diagnostika */}
         <Link href="/diagnostika" className="block w-full">

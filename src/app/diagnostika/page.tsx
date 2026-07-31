@@ -86,14 +86,37 @@ export default function Diagnostika() {
   const generateAnalysis = async (finalAnswers: string[]) => {
     setIsLoading(true);
 
-    const prompt = `Mening tanlagan energiyam: ${energy}%
+    let energyContext = "";
+    if (energy === "100") {
+      energyContext = `Mijozning energiyasi 100% (Juda ajoyib). Kouch sifatida vazifang: Bu ulkan quvvatni sochib yubormaslikka va aniq maqsadga yo'naltirishga yordam ber. (Misol: "Sizdagi bu shiddatli energiya ichingizdagi qaysi buyuk maqsadingizni ro'yobga chiqarishni talab qilyapti?").`;
+    } else {
+      energyContext = `Mijozning energiyasi ${energy}%. Kouch sifatida qat'iy vazifang: Hech qachon darhol maslahat berma yoki sababini oddiygina xulosa qilib qo'yma. Karl Yung ta'limotiga ko'ra, bunday charchoq va quvvatsizlik ko'pincha jamiyat uchun kiyilgan "Persona" (ijtimoiy niqob) ni saqlashga yoki ichki "Soya" (bostirilgan hislar) bilan kurashishga sarflanadi. Shuni hisobga olib, mijozni ichiga chuqurroq sho'ng'it.`;
+    }
 
-1. Yashirgan haqiqatim (Freyd): ${finalAnswers[0]}
-2. Meni g'azablantiradigan xislat (Yung): ${finalAnswers[1]}
-3. Asl istagim: ${finalAnswers[2]}`;
+    const prompt = `Mening holatim:
+- Energiya darajam: ${energy}%
+- Yashirgan haqiqatim (Freyd): ${finalAnswers[0]}
+- Meni g'azablantiradigan xislat (Yung): ${finalAnswers[1]}
+- Asl istagim: ${finalAnswers[2]}`;
 
     const msgs = [{ role: "user" as const, content: prompt }];
     setChatMessages(msgs);
+
+    const systemPrompt = `Sen dunyoga tan olingan, Karl Yung va Zigmund Freyd ta'limotlarini mukammal o'zlashtirgan eng kuchli psixolog-kouchsan.
+Sening vazifang mijozga to'g'ridan-to'g'ri, chuqur va uning qalbini larzaga soladigan haqiqatni ochish.
+
+${energyContext}
+
+QAT'IY QOIDALAR:
+1. Hech qachon bir vaqtning o'zida birdaniga ko'p maslahat yoki savol berib tashlama. 
+2. Agar mijozning javoblari yuzaki (masalan, "bilmadim", "charchadim") bo'lsa, "Nega?" deb tergama. "Qanday vaziyatlarda o'zingizni eng noqulay his qilasiz?" yoki "O'zingizni majbur qilayotgan qaysi jihat..." kabi kouching usullari bilan ochiltir.
+3. Har doim empatiya bilan yondash, lekin qat'iyatli bo'l.
+4. Javobing qisqa va lo'nda bo'lsin. 
+5. Har bir javobing oxirida faqat bitta chuqur o'ylantiradigan savol qoldir.
+
+Tahlilni quyidagi strukturada ber:
+🔍 **Sizning holatingiz:** [Yung va Freyd orqali chuqur kouching tahlili]
+🚀 **Asosiy savol:** [O'ylantiradigan bitta ochiq savol]`;
 
     try {
       const res = await fetch("/api/chat", {
@@ -101,15 +124,7 @@ export default function Diagnostika() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           messages: msgs,
-          systemPrompt: `Sen professional va to'g'ridan-to'g'ri haqiqatni aytuvchi kouch/psixologsan.
-Mijozning muammolarini chuqur tahlil qilib yechim ber.
-QAT'IY STRUKTURA (hech qanday salomlashishlarsiz):
-
-🔍 **Asl muammo:** [Tahlil — nimaga energiyasi ketyapti, nega o'zini aldayapti]
-
-💡 **Yechim:** [C. Jung yoki Freyd arxetiplaridan foydalanib yechim. Nima qilish kerakligi haqida aniq ko'rsatma]
-
-🚀 **Amaliy qadam:** [Shu zahotiyoq qilish kerak bo'lgan konkret 1 ta qadam]`,
+          systemPrompt,
         }),
       });
       const data = await res.json();
@@ -144,8 +159,13 @@ QAT'IY STRUKTURA (hech qanday salomlashishlarsiz):
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           messages: updated,
-          systemPrompt:
-            "Sen shaxsiy psixolog kouchsan. Mijozning savoli yoki e'tiroziga real vaqtda empatik, lekin prinsipial va konkret maslahat ber. Qisqa va lo'nda yoz.",
+          systemPrompt: `Sen professional Yungian kouchsan. 
+QOIDALAR:
+- Doim empatiya bilan yondash. Ochiq savollar ber.
+- "Nega?" deb tergama, o'rniga "Qanday holatlarda...", "Nima uchun emas, nima maqsadda..." deb so'ra.
+- Hech qachon birdaniga ko'p maslahat berma. 
+- Oxirida bitta o'ylantiradigan savol ber.
+- Suhbat davomida inson muammosini anglab yetsa, suhbatni chiroyli yakunla.`,
         }),
       });
       const data = await res.json();
@@ -354,13 +374,49 @@ QAT'IY STRUKTURA (hech qanday salomlashishlarsiz):
               )}
 
               {aiResponse && (
-                <div className="mt-7 pt-5 border-t border-[#2C3E2D]/10">
-                  <Link
-                    href="/oz-yolini-topish"
-                    className="block w-full text-center bg-[#49A045] hover:bg-[#3d8a3a] text-white py-3.5 rounded-full font-semibold transition-colors shadow-sm"
-                  >
-                    🚀 Testni boshlash
-                  </Link>
+                <div className="mt-8 pt-6 border-t border-[#2C3E2D]/10">
+                  <h3 className="font-serif text-[18px] text-[#2C3E2D] font-semibold mb-4 text-center">
+                    Keyingi qadamni tanlang:
+                  </h3>
+                  <div className="flex flex-col gap-3">
+                    {/* Option 1: Podcasts */}
+                    <a
+                      href="https://www.youtube.com/results?search_query=Amira+Rashidova+Barno+Mukimova+psixologiya"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="w-full text-left bg-[#EDF2E8] hover:bg-[#E7F0E2] text-[#2C3E2D] p-4 rounded-2xl transition-colors shadow-sm flex items-center justify-between"
+                    >
+                      <div>
+                        <p className="font-bold text-sm">🎙 Podkastlar eshitish</p>
+                        <p className="text-[12px] text-[#6B7A6A] mt-1">Ruhiyat va balans (Amira Rashidova, Barno Mukimova)</p>
+                      </div>
+                      <span className="text-xl">→</span>
+                    </a>
+
+                    {/* Option 2: Test */}
+                    <Link
+                      href="/oz-yolini-topish"
+                      className="w-full text-left bg-[#49A045] hover:bg-[#3d8a3a] text-white p-4 rounded-2xl transition-colors shadow-sm flex items-center justify-between"
+                    >
+                      <div>
+                        <p className="font-bold text-sm">🧠 O'z yo'lini topish</p>
+                        <p className="text-[12px] text-white/80 mt-1">Temperament orqali kasb va maqsadni aniqlash</p>
+                      </div>
+                      <span className="text-xl">→</span>
+                    </Link>
+
+                    {/* Option 3: Continue Chat */}
+                    <button
+                      onClick={() => chatEndRef.current?.scrollIntoView({ behavior: 'smooth' })}
+                      className="w-full text-left bg-[#2C3E2D] hover:bg-[#1e2c1f] text-white p-4 rounded-2xl transition-colors shadow-sm flex items-center justify-between"
+                    >
+                      <div>
+                        <p className="font-bold text-sm">💬 Kouch bilan suhbat</p>
+                        <p className="text-[12px] text-white/80 mt-1">Suhbatni pastda davom ettirish</p>
+                      </div>
+                      <span className="text-xl">↓</span>
+                    </button>
+                  </div>
                 </div>
               )}
             </div>
