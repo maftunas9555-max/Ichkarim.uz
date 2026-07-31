@@ -7,18 +7,39 @@ import { PlayCircle } from "lucide-react";
 const PODCASTS = [
   {
     id: 1,
-    author: "Amira Rashidova",
-    title: "Ikkinchi xotinlar, mahrga \"Gelik\" so'raydiganlar va a...",
-    image: "https://img.youtube.com/vi/JCNKByKoaN8/maxresdefault.jpg",
-    link: "https://youtu.be/JCNKByKoaN8?si=6Q57pESmoNFWzORF",
+    author: "Pivot Uz",
+    title: "DOMO qanday qilib millionlar ehtiyojiga aylandi?",
+    image: "https://img.youtube.com/vi/FxtpUN1ebPk/maxresdefault.jpg",
+    link: "https://www.youtube.com/live/FxtpUN1ebPk?si=xQydY8qxycAtAh5m",
   },
   {
     id: 2,
-    author: "Barno Qayumova",
-    title: "O'zlikni anglash va ruhiy balans haqida suhbat",
-    image: "https://images.unsplash.com/photo-1516302752625-fcc3c50ae61f?q=80&w=600&auto=format&fit=crop",
-    link: "https://www.youtube.com/results?search_query=Barno+Qayumova+podcast",
-  }
+    author: "Amira Rashidova",
+    title: "Qiz bola tarbiyasi qanday bo'lishi kerak?",
+    image: "https://img.youtube.com/vi/cFGbZmd1jno/maxresdefault.jpg",
+    link: "https://youtu.be/cFGbZmd1jno?si=6Pgjo9AVeY3yHqR5",
+  },
+  {
+    id: 3,
+    author: "SAPFIRIYA",
+    title: "Nega hayotingizda bir xil qiyinchiliklar takrorlanadi?",
+    image: "https://img.youtube.com/vi/6L5cAlt76rU/maxresdefault.jpg",
+    link: "https://youtu.be/6L5cAlt76rU?si=45YxShw7K4M32XXy",
+  },
+  {
+    id: 4,
+    author: "Barno Mukimova",
+    title: "Affirmatsiyalar haqida sizni aldashgan bo'lishi mumkin",
+    image: "https://img.youtube.com/vi/ZuK-axYno5U/maxresdefault.jpg",
+    link: "https://youtu.be/ZuK-axYno5U?si=HsdhQsg6Whrl8Uzo",
+  },
+  {
+    id: 5,
+    author: "Parvina Shoaliyeva",
+    title: "Hayot va uning qonuniyatlari | Jonli efir yozuvi",
+    image: "https://img.youtube.com/vi/_aUlaqsjMqI/maxresdefault.jpg",
+    link: "https://youtu.be/_aUlaqsjMqI?si=wO7HLdTLvzR3PA4q",
+  },
 ];
 
 /* YouTube SVG icon */
