@@ -6,6 +6,8 @@ import ModuleCard from "@/components/ModuleCard";
 import { Activity, Heart, Compass, Zap, Target, Bell, X } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
+import PodcastCarousel from "@/components/PodcastCarousel";
+
 export default function Home() {
   const [showNotification, setShowNotification] = useState(false);
 
@@ -51,12 +53,15 @@ export default function Home() {
               Bugun o'zingizga qanday g'amxo'rlik qildingiz? Rejalaringizni tekshirishni va yangi maqsadlar qo'yishni unutmang.
             </p>
             <button onClick={closeNotification} className="w-full mt-2 bg-[#2C3E2D] text-white py-2.5 rounded-full font-bold shadow-sm active:scale-95 transition-all">
-              Boshlash
+               Boshlash
             </button>
           </motion.div>
         )}
       </AnimatePresence>
       
+      {/* 0. Top Podcast Recommendations */}
+      <PodcastCarousel />
+
       {/* 1. Rejalarim (My Plans) */}
       <Link href="/rejalarim" className="block w-full">
         <ModuleCard
