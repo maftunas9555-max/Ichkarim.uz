@@ -424,42 +424,43 @@ QOIDALAR:
                   </ReactMarkdown>
                 </div>
               )}
-
-              {aiResponse && (
-                <div className="mt-8 pt-6 border-t border-[#2C3E2D]/10">
-                  <h3 className="font-serif text-[18px] text-[#2C3E2D] font-semibold mb-4 text-center">
-                    Keyingi qadamni tanlang:
-                  </h3>
-                  <div className="flex flex-col gap-3">
-                    {/* Option 1: Podcasts */}
-                    <a
-                      href="https://www.youtube.com/results?search_query=Amira+Rashidova+Barno+Mukimova+psixologiya"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="w-full text-left bg-[#EDF2E8] hover:bg-[#E7F0E2] text-[#2C3E2D] p-4 rounded-2xl transition-colors shadow-sm flex items-center justify-between"
-                    >
-                      <div>
-                        <p className="font-bold text-sm">🎙 Podkastlar eshitish</p>
-                        <p className="text-[12px] text-[#6B7A6A] mt-1">Shaxsiyatni o'stiruvchi podcastlar</p>
-                      </div>
-                      <span className="text-xl">→</span>
-                    </a>
-
-                    {/* Option 2: Test */}
-                    <Link
-                      href="/oz-yolini-topish"
-                      className="w-full text-left bg-[#49A045] hover:bg-[#3d8a3a] text-white p-4 rounded-2xl transition-colors shadow-sm flex items-center justify-between"
-                    >
-                      <div>
-                        <p className="font-bold text-sm">🧠 O'z yo'lini topish</p>
-                        <p className="text-[12px] text-white/80 mt-1">Temperament orqali kasb va maqsadni aniqlash</p>
-                      </div>
-                      <span className="text-xl">→</span>
-                    </Link>
-                  </div>
-                </div>
-              )}
             </div>
+
+            {/* Next Steps Card */}
+            {aiResponse && (
+              <div className="bg-[#F5F8F2] rounded-3xl p-7 shadow-sm">
+                <h3 className="font-serif text-[18px] text-[#2C3E2D] font-semibold mb-4 text-center">
+                  Keyingi qadamni tanlang:
+                </h3>
+                <div className="flex flex-col gap-3">
+                  {/* Option 1: Podcasts */}
+                  <a
+                    href="https://www.youtube.com/results?search_query=Amira+Rashidova+Barno+Mukimova+psixologiya"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="w-full text-left bg-[#EDF2E8] hover:bg-[#E7F0E2] text-[#2C3E2D] p-4 rounded-2xl transition-colors shadow-sm flex items-center justify-between"
+                  >
+                    <div>
+                      <p className="font-bold text-sm">🎙 Podkastlar eshitish</p>
+                      <p className="text-[12px] text-[#6B7A6A] mt-1">Shaxsiyatni o'stiruvchi podcastlar</p>
+                    </div>
+                    <span className="text-xl">→</span>
+                  </a>
+
+                  {/* Option 2: Test */}
+                  <Link
+                    href="/oz-yolini-topish"
+                    className="w-full text-left bg-[#49A045] hover:bg-[#3d8a3a] text-white p-4 rounded-2xl transition-colors shadow-sm flex items-center justify-between"
+                  >
+                    <div>
+                      <p className="font-bold text-sm">🧠 O'z yo'lini topish</p>
+                      <p className="text-[12px] text-white/80 mt-1">Temperament orqali kasb va maqsadni aniqlash</p>
+                    </div>
+                    <span className="text-xl">→</span>
+                  </Link>
+                </div>
+              </div>
+            )}
 
             {/* Ongoing Coach Chat */}
             {aiResponse && (

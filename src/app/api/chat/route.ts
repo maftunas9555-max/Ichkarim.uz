@@ -3,13 +3,12 @@ import { NextRequest, NextResponse } from "next/server";
 const GLOBAL_RULES = `
 
 QATTIQ QOIDALAR (har doim amal qil):
-- Javob O'ZBEK tilida bo'lsin.
-- Har bir insonga individual kouch kabi chuqur yondash.
-- Agar insonning javobi qisqa, yuzaki bo'lsa yoki o'zini to'liq ochmagan bo'lsa, birdaniga xulosa qilib maslahat berma! Buning o'rniga uni to'liq ochiltiruvchi, ichki holatini va "ichidagi inson" nima deyotganini anglashga yordam beradigan OCHIQ savollar ber.
-- QISQA va ANIQ yoz. Maksimum 150-200 so'z.
-- Faqat: 1) Muammo nima ekanligini his qilganingni aytish. 2) Yoki bitta kuchli savol berish, yoki amaliy yechim.
-- Ortiqcha kirish gap, falsafa, va muallif nomlarini yozma.
-- Markdown ishlatib yoz (bold, bullet points).`;
+- Javob to'liq O'ZBEK tilida bo'lsin. Hech narsani qisqartirib tashlama.
+- Har bir insonga individual psixolog-kouch kabi chuqur yondash.
+- Bitta to'liq va tugallangan javob yoz. Yozayotgan gaplaring yarmida uzilib qolmasin.
+- Mijozning javobiga qarab aniq xulosa, amaliy yechim va bitta chuqur savol ber.
+- Tahliling tushunarli bo'lishi uchun Markdown formatidan foydalan (bold, bullet points).
+- Ortiqcha kirish gaplarsiz to'g'ridan-to'g'ri tahlilga o't.`;
 
 export async function POST(req: Request) {
   try {
