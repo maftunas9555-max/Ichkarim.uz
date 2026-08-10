@@ -47,6 +47,7 @@ export async function POST(req: Request) {
     const MODELS = [
       "gemini-2.0-flash",
       "gemini-1.5-flash",
+      "gemini-1.5-flash-8b",
       "gemini-1.5-flash-latest",
       "gemini-pro",
     ];
@@ -82,13 +83,13 @@ export async function POST(req: Request) {
         } else {
           const errData = await res.json().catch(() => ({}));
           lastError = errData?.error?.message || `Model ${modelName}: ${res.status}`;
-          // If 404, try next model
-          if (res.status === 404) continue;
-          // For other errors (like auth), don't try more models
-          break;
+          console.error(`${modelName} xato qildi:`, lastError);
+          // Try next model regardless of error type (403, 404, 429, 500)
+          continue;
         }
       } catch (e: any) {
         lastError = e?.message || "Tarmoq xatosi";
+        console.error("Fetch xatosi:", lastError);
         continue;
       }
     }
