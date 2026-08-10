@@ -36,11 +36,11 @@ export default function Home() {
             initial={{ opacity: 0, y: -20, scale: 0.95 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: -20, scale: 0.95 }}
-            className="absolute top-4 left-5 right-5 z-50 neu-card p-5 border border-white/60 bg-[#F5F8F2]/95 backdrop-blur-md shadow-sm flex flex-col gap-3"
+            className="absolute top-4 left-5 right-5 z-50 p-6 rounded-3xl border border-white/60 bg-white/80 backdrop-blur-2xl shadow-[0_20px_40px_-15px_rgba(0,0,0,0.1)] flex flex-col gap-3"
           >
             <div className="flex justify-between items-start">
               <div className="flex items-center gap-3">
-                <div className="p-2 rounded-full bg-white shadow-sm text-[#49A045]">
+                <div className="w-10 h-10 rounded-2xl bg-gradient-to-br from-[#49A045] to-[#3d8a3a] flex items-center justify-center text-white shadow-md">
                   <Bell className="w-5 h-5" />
                 </div>
                 <h3 className="font-bold text-[#2C3E2D] font-serif text-lg">Xush kelibsiz!</h3>
