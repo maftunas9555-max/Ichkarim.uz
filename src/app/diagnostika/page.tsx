@@ -292,12 +292,12 @@ QOIDALAR:
                   animate={{ opacity: 1, y: 0, scale: 1 }}
                   exit={{ opacity: 0, y: 16, scale: 0.97 }}
                   transition={{ type: "spring", damping: 25, stiffness: 300 }}
-                  className="bg-[#F5F8F2] rounded-3xl p-7 shadow-sm"
+                  className="bg-white/70 backdrop-blur-2xl rounded-3xl p-7 shadow-[0_20px_40px_-15px_rgba(0,0,0,0.05)] border border-white/50"
                 >
                   <p className="font-serif text-xl text-[#2C3E2D] leading-relaxed mb-7">
                     {energy === "100" 
-                      ? "Bu baland energiyani saqlab qolish va yo'qotib qo'ymaslik haqida aniqlaymizmi?"
-                      : "Energiyangizni qayerga sarflayotganingni aniqlaymizmi?"}
+                      ? "Bu energiyangizni saqlab qolgan holda uni ijobiy narsalarga yo'naltirishni istaysizmi?"
+                      : "Energiyangizni qayerga sarflayotganingizni aniqlaymizmi?"}
                   </p>
                   <div className="flex gap-3">
                     <button
@@ -354,7 +354,7 @@ QOIDALAR:
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.35 }}
-              className="bg-[#F5F8F2] rounded-3xl p-7 sm:p-8 shadow-sm"
+              className="bg-white/70 backdrop-blur-2xl rounded-3xl p-7 sm:p-8 shadow-[0_20px_40px_-15px_rgba(0,0,0,0.05)] border border-white/50"
             >
               {(() => {
                 const activeCards = energy === "100" ? CARDS_100 : energy === "10" ? CARDS_10 : CARDS_50;
@@ -381,7 +381,7 @@ QOIDALAR:
                   onChange={(e) => setInputValue(e.target.value)}
                   placeholder="Shu yerga yozing..."
                   rows={4}
-                  className="w-full bg-[#EDF2E8] rounded-2xl p-5 pr-16 text-[#2C3E2D] text-[15px] placeholder-[#6B7A6A]/50 resize-none focus:outline-none focus:ring-2 focus:ring-[#49A045]/30 transition-shadow"
+                  className="w-full bg-white/60 border border-white/60 shadow-inner rounded-2xl p-5 pr-16 text-[#2C3E2D] text-[15px] placeholder-[#6B7A6A]/60 resize-none focus:outline-none focus:ring-2 focus:ring-[#49A045]/40 transition-shadow"
                 />
                 <button
                   onClick={submitAnswer}
@@ -409,7 +409,7 @@ QOIDALAR:
             </h1>
 
             {/* AI Analysis Card */}
-            <div className="bg-[#F5F8F2] rounded-3xl p-7 shadow-sm">
+            <div className="bg-white/80 backdrop-blur-2xl rounded-3xl p-7 shadow-[0_20px_40px_-15px_rgba(0,0,0,0.05)] border border-white/50">
               {isLoading && !aiResponse ? (
                 <div className="flex flex-col items-center justify-center py-12 gap-4">
                   <div className="w-8 h-8 border-[3px] border-[#49A045] border-t-transparent rounded-full animate-spin" />
@@ -428,11 +428,11 @@ QOIDALAR:
 
             {/* Ongoing Coach Chat */}
             {aiResponse && (
-              <div className="bg-[#F5F8F2] rounded-3xl p-5 shadow-sm flex flex-col mb-5">
+              <div className="bg-white/80 backdrop-blur-2xl rounded-3xl p-5 shadow-[0_20px_40px_-15px_rgba(0,0,0,0.05)] border border-white/50 flex flex-col mb-5">
                 {/* Chat header */}
                 <div className="flex items-center gap-2.5 mb-4 px-1">
-                  <div className="w-8 h-8 rounded-full bg-[#49A045]/15 flex items-center justify-center">
-                    <MessageCircle className="w-4 h-4 text-[#49A045]" />
+                  <div className="w-9 h-9 rounded-full bg-gradient-to-br from-[#49A045] to-[#3d8a3a] flex items-center justify-center shadow-md">
+                    <MessageCircle className="w-4 h-4 text-white" />
                   </div>
                   <h3 className="font-serif text-[18px] font-semibold text-[#2C3E2D]">
                     Suhbatni davom ettirish
@@ -490,7 +490,7 @@ QOIDALAR:
                     onKeyDown={(e) => e.key === "Enter" && sendChat()}
                     placeholder="Fikringiz bormi? Shu yerda yozing..."
                     disabled={isLoading}
-                    className="w-full bg-[#EDF2E8] rounded-full pl-5 pr-14 py-4 text-sm text-[#2C3E2D] placeholder-[#6B7A6A]/60 focus:outline-none focus:ring-2 focus:ring-[#49A045]/30 transition-shadow disabled:opacity-60"
+                    className="w-full bg-white/60 border border-white/60 shadow-inner rounded-full pl-5 pr-14 py-4 text-sm text-[#2C3E2D] placeholder-[#6B7A6A]/70 focus:outline-none focus:ring-2 focus:ring-[#49A045]/40 transition-shadow disabled:opacity-60"
                   />
                   <button
                     onClick={sendChat}
@@ -505,7 +505,7 @@ QOIDALAR:
 
             {/* Next Steps Card */}
             {aiResponse && (
-              <div className="bg-[#F5F8F2] rounded-3xl p-7 shadow-sm">
+              <div className="bg-white/70 backdrop-blur-2xl rounded-3xl p-7 shadow-[0_20px_40px_-15px_rgba(0,0,0,0.05)] border border-white/50">
                 <h3 className="font-serif text-[18px] text-[#2C3E2D] font-semibold mb-4 text-center">
                   Keyingi qadamni tanlang:
                 </h3>
@@ -515,7 +515,7 @@ QOIDALAR:
                     href="https://www.youtube.com/results?search_query=Amira+Rashidova+Barno+Mukimova+psixologiya"
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="w-full text-left bg-[#EDF2E8] hover:bg-[#E7F0E2] text-[#2C3E2D] p-4 rounded-2xl transition-colors shadow-sm flex items-center justify-between"
+                    className="w-full text-left bg-white/60 hover:bg-white/80 border border-white/60 shadow-sm text-[#2C3E2D] p-4 rounded-2xl transition-all flex items-center justify-between"
                   >
                     <div>
                       <p className="font-bold text-sm">🎙 Podkastlar eshitish</p>
@@ -527,7 +527,7 @@ QOIDALAR:
                   {/* Option 2: Test */}
                   <Link
                     href="/oz-yolini-topish"
-                    className="w-full text-left bg-[#49A045] hover:bg-[#3d8a3a] text-white p-4 rounded-2xl transition-colors shadow-sm flex items-center justify-between"
+                    className="w-full text-left bg-gradient-to-r from-[#49A045] to-[#3d8a3a] hover:opacity-90 shadow-md text-white p-4 rounded-2xl transition-all flex items-center justify-between"
                   >
                     <div>
                       <p className="font-bold text-sm">🧠 O'z yo'lini topish</p>
