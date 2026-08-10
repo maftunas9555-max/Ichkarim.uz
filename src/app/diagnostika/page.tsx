@@ -296,7 +296,7 @@ QOIDALAR:
                 >
                   <p className="font-serif text-xl text-[#2C3E2D] leading-relaxed mb-7">
                     {energy === "100" 
-                      ? "Bu ulkan energiyani to'g'ri maqsadlarga yo'naltirishni aniqlaymizmi?"
+                      ? "Bu baland energiyani saqlab qolish va yo'qotib qo'ymaslik haqida aniqlaymizmi?"
                       : "Energiyangizni qayerga sarflayotganingni aniqlaymizmi?"}
                   </p>
                   <div className="flex gap-3">
