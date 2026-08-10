@@ -57,7 +57,7 @@ export default function PodcastCarousel() {
   useEffect(() => {
     const timer = setInterval(() => {
       setCurrentIndex((prev) => (prev + 1) % PODCASTS.length);
-    }, 5000);
+    }, 3000);
     return () => clearInterval(timer);
   }, []);
 
@@ -66,7 +66,7 @@ export default function PodcastCarousel() {
       initial={{ y: 20, opacity: 0 }}
       animate={{ y: 0, opacity: 1 }}
       transition={{ duration: 0.6, ease: "easeOut" }}
-      className="relative rounded-[32px] overflow-hidden bg-[#F5F8F2] shadow-sm neu-card mb-5"
+      className="relative rounded-[32px] overflow-hidden bg-[#F5F8F2] shadow-sm neu-card"
     >
       {/* Green Header with YouTube icon */}
       <div className="bg-[#49A045] px-5 py-3 flex items-center gap-2.5">

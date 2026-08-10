@@ -119,16 +119,25 @@ export default function Diagnostika() {
 
     let energyContext = "";
     if (energy === "100") {
-      energyContext = `Mijozning energiyasi 100% (Juda ajoyib). Kouch sifatida vazifang: Bu ulkan quvvatni sochib yubormaslikka va aniq maqsadga yo'naltirishga yordam ber. (Misol: "Sizdagi bu shiddatli energiya ichingizdagi qaysi buyuk maqsadingizni ro'yobga chiqarishni talab qilyapti?").`;
+      energyContext = `Mijozning energiyasi 100% (Juda ajoyib). Kouch sifatida vazifang: 
+1. Bu ulkan quvvatni qanday qilib barqaror saqlab qolish va yo'qotib qo'ymaslik haqida qisqa, aniq taklif ber.
+2. Bu energiyani sochib yubormasdan aniq maqsadga yo'naltirishga yordam beruvchi bitta kuchli kouching savolini ber.`;
+    } else if (energy === "50") {
+      energyContext = `Mijozning energiyasi 50% (O'rtacha). Kouch sifatida vazifang: 
+1. Uning bergan javoblaridan kelib chiqib, yo'qotilayotgan quvvatni qanday tiklash bo'yicha individual va amaliy yechim taklif qil.
+2. O'zini anglashga undovchi, vaziyatiga mos bitta kuchli ochiq savol ber.`;
     } else {
-      energyContext = `Mijozning energiyasi ${energy}%. Kouch sifatida qat'iy vazifang: Hech qachon darhol maslahat berma yoki sababini oddiygina xulosa qilib qo'yma. Karl Yung ta'limotiga ko'ra, bunday charchoq va quvvatsizlik ko'pincha jamiyat uchun kiyilgan "Persona" (ijtimoiy niqob) ni saqlashga yoki ichki "Soya" (bostirilgan hislar) bilan kurashishga sarflanadi. Shuni hisobga olib, mijozni ichiga chuqurroq sho'ng'it.`;
+      energyContext = `Mijozning energiyasi 10% (Juda past). Kouch sifatida qat'iy vazifang: 
+1. Karl Yung ta'limotiga ko'ra, bunday chuqur quvvatsizlik "Persona" (jamiyat uchun niqob) ni saqlashga yoki ichki "Soya" (bostirilgan hislar, chala ishlar) bilan kurashishga sarflanganini ko'rsatib o't.
+2. Mijozning bergan javobiga qarab, energiyani so'rayotgan "teshikni" yopish uchun darhol qilinishi kerak bo'lgan bitta kichik amaliy qadam (yechim) ber.
+3. Mijozni o'z qalbini eshitishga undovchi chuqur savol ber.`;
     }
 
     const prompt = `Mening holatim:
 - Energiya darajam: ${energy}%
-- Yashirgan haqiqatim (Freyd): ${finalAnswers[0]}
-- Meni g'azablantiradigan xislat (Yung): ${finalAnswers[1]}
-- Asl istagim: ${finalAnswers[2]}`;
+- 1-savolga javobim: ${finalAnswers[0]}
+- 2-savolga javobim: ${finalAnswers[1]}
+- 3-savolga javobim: ${finalAnswers[2]}`;
 
     const msgs = [{ role: "user" as const, content: prompt }];
     setChatMessages(msgs);
@@ -140,13 +149,13 @@ ${energyContext}
 
 QAT'IY QOIDALAR:
 1. Hech qachon bir vaqtning o'zida birdaniga ko'p maslahat yoki savol berib tashlama. 
-2. Agar mijozning javoblari yuzaki (masalan, "bilmadim", "charchadim") bo'lsa, "Nega?" deb tergama. "Qanday vaziyatlarda o'zingizni eng noqulay his qilasiz?" yoki "O'zingizni majbur qilayotgan qaysi jihat..." kabi kouching usullari bilan ochiltir.
-3. Har doim empatiya bilan yondash, lekin qat'iyatli bo'l.
-4. Javobing qisqa va lo'nda bo'lsin. 
-5. Har bir javobing oxirida faqat bitta chuqur o'ylantiradigan savol qoldir.
+2. Har doim empatiya bilan yondash, lekin qat'iyatli bo'l.
+3. Javobing qisqa va lo'nda bo'lsin. 
+4. Tahlil, yechim va savol bir-biriga uzviy bog'langan bo'lsin.
 
 Tahlilni quyidagi strukturada ber:
-🔍 **Sizning holatingiz:** [Yung va Freyd orqali chuqur kouching tahlili]
+🔍 **Sizning holatingiz:** [Yung va Freyd orqali mijozning bergan javoblariga asoslangan chuqur kouching tahlili]
+💡 **Amaliy yechim:** [Quvvatni saqlab qolish (100%) yoki uni qayta tiklash (50%, 10%) bo'yicha individual va aniq taklif/qadam]
 🚀 **Asosiy savol:** [O'ylantiradigan bitta ochiq savol]`;
 
     try {
@@ -286,7 +295,9 @@ QOIDALAR:
                   className="bg-[#F5F8F2] rounded-3xl p-7 shadow-sm"
                 >
                   <p className="font-serif text-xl text-[#2C3E2D] leading-relaxed mb-7">
-                    Energiyangizni qayerga sarflayotganingni aniqlaymizmi?
+                    {energy === "100" 
+                      ? "Bu ulkan energiyani to'g'ri maqsadlarga yo'naltirishni aniqlaymizmi?"
+                      : "Energiyangizni qayerga sarflayotganingni aniqlaymizmi?"}
                   </p>
                   <div className="flex gap-3">
                     <button
