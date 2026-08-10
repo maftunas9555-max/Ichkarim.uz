@@ -47,12 +47,10 @@ export async function POST(req: Request) {
     const MODELS = [
       "gemini-2.0-flash",
       "gemini-1.5-flash",
-      "gemini-1.5-flash-8b",
-      "gemini-1.5-flash-latest",
-      "gemini-pro",
+      "gemini-1.5-flash-8b"
     ];
 
-    let lastError = "";
+    let allErrors: string[] = [];
 
     for (const modelName of MODELS) {
       try {
@@ -79,22 +77,20 @@ export async function POST(req: Request) {
           if (text) {
             return NextResponse.json({ reply: text, message: text }, { status: 200 });
           }
-          lastError = "AI javob qaytarmadi";
+          allErrors.push(`${modelName}: AI javob qaytarmadi`);
         } else {
           const errData = await res.json().catch(() => ({}));
-          lastError = errData?.error?.message || `Model ${modelName}: ${res.status}`;
-          console.error(`${modelName} xato qildi:`, lastError);
-          // Try next model regardless of error type (403, 404, 429, 500)
+          const errStr = errData?.error?.message || `Status ${res.status}`;
+          allErrors.push(`${modelName}: ${errStr}`);
           continue;
         }
       } catch (e: any) {
-        lastError = e?.message || "Tarmoq xatosi";
-        console.error("Fetch xatosi:", lastError);
+        allErrors.push(`${modelName}: ${e?.message || "Tarmoq xatosi"}`);
         continue;
       }
     }
 
-    return NextResponse.json({ error: `AI xatosi: ${lastError}` }, { status: 500 });
+    return NextResponse.json({ error: `AI xatosi: ${allErrors.join(" | ")}` }, { status: 500 });
   } catch (error: any) {
     console.error("API Xatosi:", error?.message || error);
     return NextResponse.json({ error: `Serverda xatolik: ${error?.message || "Noma'lum"}` }, { status: 500 });
