@@ -418,7 +418,7 @@ QOIDALAR:
                   </p>
                 </div>
               ) : (
-                <div className="prose prose-sm max-w-none text-[#2C3E2D] prose-strong:text-[#2C3E2D] prose-p:leading-relaxed prose-p:mb-3">
+                <div className="prose prose-lg max-w-none text-[#2C3E2D] prose-headings:font-serif prose-headings:text-[#2C3E2D] prose-p:leading-[1.8] prose-p:text-justify text-[16px] sm:text-[18px]">
                   <ReactMarkdown remarkPlugins={[remarkGfm]}>
                     {aiResponse || ""}
                   </ReactMarkdown>
@@ -426,51 +426,15 @@ QOIDALAR:
               )}
             </div>
 
-            {/* Next Steps Card */}
-            {aiResponse && (
-              <div className="bg-[#F5F8F2] rounded-3xl p-7 shadow-sm">
-                <h3 className="font-serif text-[18px] text-[#2C3E2D] font-semibold mb-4 text-center">
-                  Keyingi qadamni tanlang:
-                </h3>
-                <div className="flex flex-col gap-3">
-                  {/* Option 1: Podcasts */}
-                  <a
-                    href="https://www.youtube.com/results?search_query=Amira+Rashidova+Barno+Mukimova+psixologiya"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="w-full text-left bg-[#EDF2E8] hover:bg-[#E7F0E2] text-[#2C3E2D] p-4 rounded-2xl transition-colors shadow-sm flex items-center justify-between"
-                  >
-                    <div>
-                      <p className="font-bold text-sm">🎙 Podkastlar eshitish</p>
-                      <p className="text-[12px] text-[#6B7A6A] mt-1">Shaxsiyatni o'stiruvchi podcastlar</p>
-                    </div>
-                    <span className="text-xl">→</span>
-                  </a>
-
-                  {/* Option 2: Test */}
-                  <Link
-                    href="/oz-yolini-topish"
-                    className="w-full text-left bg-[#49A045] hover:bg-[#3d8a3a] text-white p-4 rounded-2xl transition-colors shadow-sm flex items-center justify-between"
-                  >
-                    <div>
-                      <p className="font-bold text-sm">🧠 O'z yo'lini topish</p>
-                      <p className="text-[12px] text-white/80 mt-1">Temperament orqali kasb va maqsadni aniqlash</p>
-                    </div>
-                    <span className="text-xl">→</span>
-                  </Link>
-                </div>
-              </div>
-            )}
-
             {/* Ongoing Coach Chat */}
             {aiResponse && (
-              <div className="bg-[#F5F8F2] rounded-3xl p-5 shadow-sm flex flex-col">
+              <div className="bg-[#F5F8F2] rounded-3xl p-5 shadow-sm flex flex-col mb-5">
                 {/* Chat header */}
                 <div className="flex items-center gap-2.5 mb-4 px-1">
                   <div className="w-8 h-8 rounded-full bg-[#49A045]/15 flex items-center justify-center">
                     <MessageCircle className="w-4 h-4 text-[#49A045]" />
                   </div>
-                  <h3 className="font-serif text-lg font-semibold text-[#2C3E2D]">
+                  <h3 className="font-serif text-[18px] font-semibold text-[#2C3E2D]">
                     Suhbatni davom ettirish
                   </h3>
                 </div>
@@ -535,6 +499,42 @@ QOIDALAR:
                   >
                     <ArrowUp className="w-4 h-4" />
                   </button>
+                </div>
+              </div>
+            )}
+
+            {/* Next Steps Card */}
+            {aiResponse && (
+              <div className="bg-[#F5F8F2] rounded-3xl p-7 shadow-sm">
+                <h3 className="font-serif text-[18px] text-[#2C3E2D] font-semibold mb-4 text-center">
+                  Keyingi qadamni tanlang:
+                </h3>
+                <div className="flex flex-col gap-3">
+                  {/* Option 1: Podcasts */}
+                  <a
+                    href="https://www.youtube.com/results?search_query=Amira+Rashidova+Barno+Mukimova+psixologiya"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="w-full text-left bg-[#EDF2E8] hover:bg-[#E7F0E2] text-[#2C3E2D] p-4 rounded-2xl transition-colors shadow-sm flex items-center justify-between"
+                  >
+                    <div>
+                      <p className="font-bold text-sm">🎙 Podkastlar eshitish</p>
+                      <p className="text-[12px] text-[#6B7A6A] mt-1">Shaxsiyatni o'stiruvchi podcastlar</p>
+                    </div>
+                    <span className="text-xl">→</span>
+                  </a>
+
+                  {/* Option 2: Test */}
+                  <Link
+                    href="/oz-yolini-topish"
+                    className="w-full text-left bg-[#49A045] hover:bg-[#3d8a3a] text-white p-4 rounded-2xl transition-colors shadow-sm flex items-center justify-between"
+                  >
+                    <div>
+                      <p className="font-bold text-sm">🧠 O'z yo'lini topish</p>
+                      <p className="text-[12px] text-white/80 mt-1">Temperament orqali kasb va maqsadni aniqlash</p>
+                    </div>
+                    <span className="text-xl">→</span>
+                  </Link>
                 </div>
               </div>
             )}

@@ -7,8 +7,8 @@ QATTIQ QOIDALAR (har doim amal qil):
 - Har bir insonga individual psixolog-kouch kabi chuqur yondash.
 - Bitta to'liq va tugallangan javob yoz. Yozayotgan gaplaring yarmida uzilib qolmasin.
 - Mijozning javobiga qarab aniq xulosa, amaliy yechim va bitta chuqur savol ber.
-- Tahliling tushunarli bo'lishi uchun Markdown formatidan foydalan (bold, bullet points).
-- Ortiqcha kirish gaplarsiz to'g'ridan-to'g'ri tahlilga o't.`;
+- Tahliling tushunarli va qiziqarli maqola kabi bo'lishi uchun Markdown formatidan keng foydalan: muhim so'zlarni **qalin (bold)** qilib, hissiyotli yoki alohida urg'u beriladigan joylarni *qiya (italic)* qilib yoz.
+- Matn o'qishga oson bo'lishi uchun chiroyli abzaslarga (paragraflarga) bo'lib yoz. Ortiqcha kirish gaplarsiz to'g'ridan-to'g'ri tahlilga o't.`;
 
 export async function POST(req: Request) {
   try {
