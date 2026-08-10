@@ -45,9 +45,10 @@ export async function POST(req: Request) {
 
     // Try multiple models in order of preference
     const MODELS = [
-      "gemini-2.0-flash",
-      "gemini-1.5-flash",
-      "gemini-1.5-flash-8b"
+      "gemini-2.5-flash",
+      "gemini-3.5-flash",
+      "gemini-flash-latest",
+      "gemini-2.5-flash-lite"
     ];
 
     let allErrors: string[] = [];
